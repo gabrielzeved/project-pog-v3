@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { MyCounterButton } from '@repo/ui';
+	import { Client } from '../Client';
+
+	const client = new Client();
+
+	client.message();
 </script>
 
-<h1>Web</h1>
-<MyCounterButton />
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<h1>teste</h1>

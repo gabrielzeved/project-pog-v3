@@ -15,17 +15,18 @@
 		"test:unit": "vitest"
 	},
 	"dependencies": {
-		"@ppog/shared": "*"
+		"@ppog/shared": "*",
+		"socket.io-client": "^4.7.4"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.40.1",
+		"@ppog/config": "*",
 		"@sveltejs/adapter-auto": "^3.1.0",
 		"@sveltejs/kit": "^2.0.6",
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
 		"@typescript-eslint/eslint-plugin": "^6.17.0",
 		"@typescript-eslint/parser": "^6.17.0",
 		"eslint": "^8.56.0",
-		"@ppog/config": "*",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
 		"svelte": "^4.2.8",

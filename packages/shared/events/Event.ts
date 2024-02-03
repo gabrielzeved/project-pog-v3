@@ -2,30 +2,19 @@ export enum EventType {
   PLAYER_CHAT
 }
 
-export class Event {
-  private _type: EventType;
+export abstract class Event {
+  protected abstract type: EventType;
 
-  get type(): EventType {
-    return this._type;
-  }
-
-  get name(): string {
-    return EventType[this._type];
-  }
-
-  constructor(type: EventType) {
-    this._type = type;
+  get id(): number {
+    return this.type;
   }
 }
 
-export class CancellableEvent extends Event {
-  private _cancelled: boolean = false;
+export abstract class CancellableEvent extends Event {
+  protected abstract type: EventType;
+  protected cancelled: boolean = false;
 
   get isCancelled(): boolean {
-    return this._cancelled;
-  }
-
-  set isCancelled(cancelled: boolean) {
-    this._cancelled = cancelled;
+    return this.cancelled;
   }
 }
