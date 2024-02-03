@@ -1,14 +1,22 @@
 <script lang="ts">
-	import { Client } from '../Client';
+	import { client, gameApp } from '../main';
 
-	const client = new Client();
+	const clients = gameApp.connectedClients;
 
 	let value: string = '';
 
 	function sendMessage() {
-		client.message(value);
+		client.sendChatMessage(value);
 	}
 </script>
 
-<input bind:value type="text" />
+<div>
+	<p>Connected clients:</p>
+	<p>
+		{$clients}
+	</p>
+</div>
+
+<label for="message">Send message</label>
+<input name="message" bind:value type="text" />
 <button on:click={sendMessage}>Enviar</button>

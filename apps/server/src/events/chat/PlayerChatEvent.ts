@@ -1,4 +1,4 @@
-import { Entity } from '../..';
+import { Entity } from '@ppog/shared';
 import { Event, EventType } from '../Event';
 
 export class PlayerChatEvent extends Event {

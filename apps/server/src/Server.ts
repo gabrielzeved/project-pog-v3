@@ -1,21 +1,29 @@
-import { Event, PacketType, Player, PlayerChatEvent } from '@ppog/shared';
+import { PacketType, Player } from '@ppog/shared';
 import { Server as SocketServer } from 'socket.io';
 import { v4 } from 'uuid';
 import { Client } from './Client';
 import { GameManager } from './GameManager';
-import { EventQueue } from './event/EventQueue';
+import { Event } from './events/Event';
+import { EventQueue } from './events/EventQueue';
 import { EventClass, ListenerFunction } from './listeners/Listener';
+
+import { PlayerChatEvent } from './events/chat';
+import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
+
 import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
+import { PlayerDisconnectEventListener } from './listeners/player/PlayerDisconnectListener';
+import { PlayerJoinEventListener } from './listeners/player/PlayerJoinListener';
 
 interface ServerConfig {
   tps: number;
 }
 
 export class Server {
-  private clients: Map<String, Client> = new Map();
+  private clients: Map<string, Client> = new Map();
   private eventQueue: EventQueue = new EventQueue();
   private listeners: Map<EventClass, ListenerFunction[]> = new Map();
   private gameManager: GameManager = new GameManager(this);
+
   private get tpms(): number {
     return this.config.tps / 1000;
   }
@@ -30,6 +38,18 @@ export class Server {
     this.setupListeners();
   }
 
+  removeClient(id: string) {
+    this.clients.delete(id);
+  }
+
+  getClient(id: string) {
+    return this.clients.get(id);
+  }
+
+  getAllClients(): string[] {
+    return Array.from(this.clients.keys());
+  }
+
   setup() {
     this.socket.on('connection', (socketClient) => {
       const id = v4();
@@ -40,6 +60,8 @@ export class Server {
   }
 
   setupListeners() {
+    this.addListener(PlayerJoinEvent, PlayerJoinEventListener);
+    this.addListener(PlayerDisconnectEvent, PlayerDisconnectEventListener);
     this.addListener(PlayerChatEvent, PlayerChatEventListener);
   }
 

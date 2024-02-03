@@ -1,2 +1,3 @@
 export * from './Packet';
-export * from './chat';
+export * from './client';
+export * from './server';
