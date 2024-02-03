@@ -1,5 +1,5 @@
 import { Packet } from '@ppog/shared';
-import { Socket } from 'socket.io';
+import { DisconnectReason, Socket } from 'socket.io';
 import { server } from '.';
 import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
 
@@ -12,13 +12,14 @@ export class Client {
   }
 
   setup() {
-    this.socket.on('disconnect', () => {
-      this.disconnect();
+    this.socket.on('disconnect', (reason: DisconnectReason) => {
+      this.disconnect(reason);
     });
     this.socket.onAny((evt, data) => {
       try {
         if (!this.onMessage(evt, data)) {
           console.log('Unknown command (' + evt + '), disconnected.');
+          this.disconnect();
         }
       } catch (err) {
         console.error(err);

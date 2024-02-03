@@ -19,10 +19,11 @@ interface ServerConfig {
 }
 
 export class Server {
-  private clients: Map<String, Client> = new Map();
+  private clients: Map<string, Client> = new Map();
   private eventQueue: EventQueue = new EventQueue();
   private listeners: Map<EventClass, ListenerFunction[]> = new Map();
   private gameManager: GameManager = new GameManager(this);
+
   private get tpms(): number {
     return this.config.tps / 1000;
   }
@@ -35,6 +36,18 @@ export class Server {
   ) {
     this.setup();
     this.setupListeners();
+  }
+
+  removeClient(id: string) {
+    this.clients.delete(id);
+  }
+
+  getClient(id: string) {
+    return this.clients.get(id);
+  }
+
+  getAllClients(): string[] {
+    return Array.from(this.clients.keys());
   }
 
   setup() {
