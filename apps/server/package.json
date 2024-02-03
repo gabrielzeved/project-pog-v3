@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon -r dotenv/config ./src/index.ts --watch",
+    "build": "echo 'Add build script here'",
+    "test": "echo 'Add test script here'",
+    "lint": "echo 'Add lint script here'"
+  },
+  "devDependencies": {
+    "@ppog/config": "*",
+    "@types/uuid": "^9.0.8",
+    "nodemon": "^3.0.3"
+  },
+  "dependencies": {
+    "@ppog/shared": "*",
+    "dotenv": "^16.4.1",
+    "socket.io": "^4.7.4",
+    "uuid": "^9.0.1"
+  }
+}
