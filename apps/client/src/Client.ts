@@ -1,6 +1,5 @@
-import { ChatMessagePacket } from '@ppog/shared';
+import { ChatMessagePacket, Packet } from '@ppog/shared';
 import { io, type Socket } from 'socket.io-client';
-
 export class Client {
 	socket!: Socket;
 
@@ -9,14 +8,17 @@ export class Client {
 	}
 
 	setup() {
-		this.socket = this.socket = io('ws://26.255.119.133:3000', {
+		this.socket = this.socket = io('ws://localhost:3000', {
 			transports: ['websocket']
 		});
 	}
 
-	message(message: string) {
+	sendChatMessage(message: string) {
 		const packet = new ChatMessagePacket(message);
+		this.sendPacket(packet);
+	}
 
+	sendPacket(packet: Packet) {
 		this.socket.emit(packet.name, packet);
 	}
 }

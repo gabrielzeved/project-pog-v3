@@ -1,4 +1,4 @@
-import { Event } from '@ppog/shared';
+import { Event } from './Event';
 
 export class EventQueue {
   private _queue: Event[] = [];

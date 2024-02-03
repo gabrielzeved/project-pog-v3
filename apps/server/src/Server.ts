@@ -1,11 +1,13 @@
-import { ChatMessagePacket, Event, PacketType, Player, PlayerChatEvent } from '@ppog/shared';
+import { ChatMessagePacket, PacketType, Player } from '@ppog/shared';
 import { Server as SocketServer } from 'socket.io';
 import { v4 } from 'uuid';
 import { Client } from './Client';
 import { GameManager } from './GameManager';
-import { EventQueue } from './event/EventQueue';
+import { EventQueue } from './events/EventQueue';
 import { EventClass, ListenerFunction } from './listeners/Listener';
 import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
+import { Event } from './events/Event';
+import { PlayerChatEvent } from './events/chat';
 
 interface ServerConfig {
   tps: number;

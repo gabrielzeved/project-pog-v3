@@ -5,10 +5,14 @@
 
 	let value: string = '';
 
+	let clients: string[] = [];
+
 	function sendMessage() {
-		client.message(value);
+		client.sendChatMessage(value);
 	}
 </script>
+
+{clients}
 
 <input bind:value type="text" />
 <button on:click={sendMessage}>Enviar</button>
