@@ -1,12 +1,15 @@
 import { Packet } from '@ppog/shared';
 import { Socket } from 'socket.io';
 import { server } from '.';
+import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
 
 export class Client {
   constructor(
     public socket: Socket,
     public readonly entityId: string
-  ) {}
+  ) {
+    server.queueEvent(new PlayerJoinEvent(entityId));
+  }
 
   setup() {
     this.socket.on('disconnect', () => {
@@ -31,8 +34,8 @@ export class Client {
     this.socket.emit(packet.name, packet);
   }
 
-  disconnect() {
+  disconnect(reason = 'unknown') {
     if (this.socket.connected) this.socket.disconnect();
-    // this.server.queueEvent(new PlayerDisconnectEvent(this.id, this.entityId));
+    server.queueEvent(new PlayerDisconnectEvent(this.entityId, reason));
   }
 }

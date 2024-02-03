@@ -5,9 +5,14 @@ import { Client } from './Client';
 import { GameManager } from './GameManager';
 import { EventQueue } from './events/EventQueue';
 import { EventClass, ListenerFunction } from './listeners/Listener';
-import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
 import { Event } from './events/Event';
+
 import { PlayerChatEvent } from './events/chat';
+import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
+
+import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
+import { PlayerJoinEventListener } from './listeners/player/PlayerJoinListener';
+import { PlayerDisconnectEventListener } from './listeners/player/PlayerDisconnectListener';
 
 interface ServerConfig {
   tps: number;
@@ -42,6 +47,8 @@ export class Server {
   }
 
   setupListeners() {
+    this.addListener(PlayerJoinEvent, PlayerJoinEventListener);
+    this.addListener(PlayerDisconnectEvent, PlayerDisconnectEventListener);
     this.addListener(PlayerChatEvent, PlayerChatEventListener);
   }
 

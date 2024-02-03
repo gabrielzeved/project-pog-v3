@@ -1,5 +1,7 @@
 export enum EventType {
-  PLAYER_CHAT
+  PLAYER_CHAT,
+  PLAYER_JOIN,
+  PLAYER_DISCONNECT
 }
 
 export abstract class Event {
