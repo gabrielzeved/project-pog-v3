@@ -3,7 +3,12 @@
 
 	const client = new Client();
 
-	client.message();
+	let value: string = '';
+
+	function sendMessage() {
+		client.message(value);
+	}
 </script>
 
-<h1>teste</h1>
+<input bind:value type="text" />
+<button on:click={sendMessage}>Enviar</button>

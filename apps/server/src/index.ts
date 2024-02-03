@@ -18,9 +18,9 @@ function main() {
     console.log('listening on: ', port);
   });
 
-  server = new Server(io, {});
+  server = new Server(io);
 
-  server.setup();
+  server.run();
 }
 
 main();

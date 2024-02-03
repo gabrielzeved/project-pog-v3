@@ -1,9 +1,5 @@
-import { ChatMessagePacket } from '@ppog/shared';
+import { PlayerChatEvent } from '@ppog/shared';
 
-export function ChatMessagePacketListener(packet: ChatMessagePacket) {
-  console.log(`${packet.userId} : ${packet.message}`);
+export function PlayerChatEventListener(evt: PlayerChatEvent) {
+  console.log(`${evt.sender.id} : ${evt.message}`);
 }
-
-// export function ChatMessageListener(evt: ChatMessagePacket) {
-//   console.log(`${evt.userId} : ${evt.message}`);
-// }

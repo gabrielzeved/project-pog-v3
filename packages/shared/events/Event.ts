@@ -5,8 +5,8 @@ export enum EventType {
 export abstract class Event {
   protected abstract type: EventType;
 
-  get id(): number {
-    return this.type;
+  get name(): string {
+    return EventType[this.type];
   }
 }
 

@@ -14,8 +14,8 @@ export class Client {
 		});
 	}
 
-	message() {
-		const packet = new ChatMessagePacket('teste', 'testando');
+	message(message: string) {
+		const packet = new ChatMessagePacket(message);
 
 		this.socket.emit(packet.name, packet);
 	}

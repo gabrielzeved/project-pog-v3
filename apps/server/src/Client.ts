@@ -3,7 +3,10 @@ import { Socket } from 'socket.io';
 import { server } from '.';
 
 export class Client {
-  constructor(public socket: Socket) {}
+  constructor(
+    public socket: Socket,
+    public readonly entityId: string
+  ) {}
 
   setup() {
     this.socket.on('disconnect', () => {
@@ -21,7 +24,7 @@ export class Client {
   }
 
   onMessage(evt: string, data: any): boolean {
-    return server.onMessage(evt, data);
+    return server.onPacket(this, evt, data);
   }
 
   sendPacket(packet: Packet) {
