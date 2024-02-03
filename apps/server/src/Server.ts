@@ -1,4 +1,4 @@
-import { ChatMessagePacket, PacketType, Player } from '@ppog/shared';
+import { ChatMessagePacket, Packet, PacketType, Player } from '@ppog/shared';
 import { Server as SocketServer } from 'socket.io';
 import { v4 } from 'uuid';
 import { Client } from './Client';
@@ -44,6 +44,18 @@ export class Server {
 
   getClient(id: string) {
     return this.clients.get(id);
+  }
+
+  sendPacketToAll(packet: Packet) {
+    this.clients.forEach((client) => {
+      client.sendPacket(packet);
+    });
+  }
+
+  sendPacketToAllBut(packet: Packet, id: string) {
+    this.clients.forEach((client) => {
+      if (client.entityId !== id) client.sendPacket(packet);
+    });
   }
 
   getAllClients(): string[] {

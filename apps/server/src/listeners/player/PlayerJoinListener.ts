@@ -20,5 +20,6 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   // TODO: send spawned entities to the player
 
   // send connected players
-  client.sendPacket(new PlayerInfoUpdatePacket({ clients: server.getAllClients() }));
+  // client.sendPacket(new PlayerInfoUpdatePacket({ clients: server.getAllClients() }));
+  server.sendPacketToAll(new PlayerInfoUpdatePacket({ clients: server.getAllClients() }));
 }
