@@ -15,7 +15,7 @@ export class Client {
     this.socket.onAny((evt, data) => {
       try {
         if (!this.onMessage(evt, data)) {
-          console.log('Unknown command (' + evt + '), disconnected.');
+          console.log('Unknown command (' + evt + ').');
         }
       } catch (err) {
         console.error(err);

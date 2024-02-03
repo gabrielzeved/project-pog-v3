@@ -1,4 +1,4 @@
-import { ChatMessagePacket, Event, PacketType, Player, PlayerChatEvent } from '@ppog/shared';
+import { Event, PacketType, Player, PlayerChatEvent } from '@ppog/shared';
 import { Server as SocketServer } from 'socket.io';
 import { v4 } from 'uuid';
 import { Client } from './Client';
@@ -70,19 +70,13 @@ export class Server {
   onPacket(client: Client, evt: string, data: any): boolean {
     switch (evt) {
       case PacketType.CHAT_MESSAGE:
-        this.handleMessagePacket(client, data);
+        this.queueEvent(new PlayerChatEvent(new Player(client.entityId), data.message));
         break;
       default:
         return false;
     }
 
     return true;
-  }
-
-  handleMessagePacket(client: Client, data: ChatMessagePacket) {
-    const player = new Player(client.entityId);
-
-    this.queueEvent(new PlayerChatEvent(player, data.message));
   }
 
   run() {
