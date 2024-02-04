@@ -1,4 +1,4 @@
-import { ChatMessagePacket, Packet } from '@ppog/shared';
+import { Packet, ServerPackets } from '@ppog/shared';
 import { io, type Socket } from 'socket.io-client';
 import { HandleData } from './HandleData';
 
@@ -32,7 +32,7 @@ export class Client {
 	}
 
 	sendChatMessage(message: string) {
-		const packet = new ChatMessagePacket(message);
+		const packet = new ServerPackets.ChatMessagePacket(message);
 		this.sendPacket(packet);
 	}
 

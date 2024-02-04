@@ -1,1 +1,5 @@
-export * from './chat';
+import { ChatMessagePacket } from './chat';
+
+export const ServerPackets = {
+  ChatMessagePacket
+};

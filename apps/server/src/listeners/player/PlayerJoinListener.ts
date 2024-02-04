@@ -1,4 +1,4 @@
-import { PlayerInfoPacket, PlayerInfoUpdatePacket } from '@ppog/shared';
+import { ClientPackets } from '@ppog/shared';
 import { server } from '../..';
 import { PlayerJoinEvent } from '../../events/player';
 import { Logger } from '../../utils/Logger';
@@ -13,7 +13,7 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
 
   // send player info to the player
   client.sendPacket(
-    new PlayerInfoPacket({
+    new ClientPackets.PlayerInfoPacket({
       entityId: evt.id
     })
   );
@@ -21,6 +21,7 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   // TODO: send spawned entities to the player
 
   // send connected players
-  // client.sendPacket(new PlayerInfoUpdatePacket({ clients: server.getAllClients() }));
-  server.sendPacketToAll(new PlayerInfoUpdatePacket({ clients: server.getAllClients() }));
+  server.sendPacketToAll(
+    new ClientPackets.PlayerInfoUpdatePacket({ clients: server.getAllClients() })
+  );
 }
