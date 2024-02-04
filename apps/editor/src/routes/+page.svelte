@@ -3,6 +3,7 @@
 	import TileSelector from '$lib/TileSelector.svelte';
 	import Button from '$lib/ui/Button.svelte';
 
+	import LayerList from '$lib/LayerList.svelte';
 	import { editorContext } from '$lib/store';
 
 	const store = editorContext.store;
@@ -20,6 +21,8 @@
 			<img alt="" src="./imageIcon.svg" />
 			Import asset
 		</Button>
+
+		<LayerList />
 	</div>
 
 	<div class="flex flex-col w-full">

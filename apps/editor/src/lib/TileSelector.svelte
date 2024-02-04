@@ -106,9 +106,9 @@
 		});
 
 		viewport.on('mousedown', (evt) => {
-			dragging = true;
-
 			if (evt.button != 0) return;
+
+			dragging = true;
 
 			const point = viewport.toWorld(evt.global);
 			const newPoint = new PIXI.Point(
@@ -128,9 +128,9 @@
 		});
 
 		viewport.on('mouseup', (evt) => {
-			dragging = false;
-
 			if (evt.button != 0) return;
+
+			dragging = false;
 
 			const point = viewport.toWorld(evt.global);
 			const newPoint = new PIXI.Point(
