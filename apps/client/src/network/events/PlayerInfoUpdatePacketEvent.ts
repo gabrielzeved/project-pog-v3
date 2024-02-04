@@ -1,4 +1,4 @@
-import type { PlayerInfoUpdatePacket } from '@ppog/shared';
+import type { PlayerInfoUpdatePacket } from '@ppog/shared/packets/client/player';
 import type { Client } from '../Client';
 import { gameApp } from '../../main';
 

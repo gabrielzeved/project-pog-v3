@@ -1,4 +1,4 @@
-import { PlayerInfoUpdatePacket } from '@ppog/shared';
+import { ClientPackets } from '@ppog/shared';
 import { server } from '../..';
 import { PlayerDisconnectEvent } from '../../events/player';
 import { Logger } from '../../utils/Logger';
@@ -9,7 +9,7 @@ export function PlayerDisconnectEventListener(evt: PlayerDisconnectEvent) {
 
   // Send connected players to everyone
   server.sendPacketToAllBut(
-    new PlayerInfoUpdatePacket({ clients: server.getAllClients() }),
+    new ClientPackets.PlayerInfoUpdatePacket({ clients: server.getAllClients() }),
     evt.id
   );
 }

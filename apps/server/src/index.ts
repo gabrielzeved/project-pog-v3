@@ -3,11 +3,12 @@ import { Server as SocketServer } from 'socket.io';
 import { Server } from './Server';
 import readline from 'readline';
 import { Logger } from './utils/Logger';
+import { ClientPackets } from '@ppog/shared';
 
 export let server: Server;
 
 function main() {
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT ?? 3000;
 
   const http = createServer();
   const io = new SocketServer(http, {
@@ -28,12 +29,25 @@ function main() {
 
 function commandHandler() {
   const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+    input: process.stdin
   });
 
-  rl.on(`Type a command or send a message`, (command) => {
-    console.log(command);
+  console.log('Type a command or send a message');
+
+  rl.on(`line`, (input) => {
+    if (input.startsWith('/')) {
+      const command = input.split(' ');
+
+      switch (command[0]) {
+        case '/help':
+          console.log('Help command');
+          break;
+        default:
+          break;
+      }
+    } else {
+      server.sendPacketToAll(new ClientPackets.ChatMessagePacket(input));
+    }
   });
 }
 
