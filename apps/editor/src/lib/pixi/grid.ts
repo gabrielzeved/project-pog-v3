@@ -1,3 +1,4 @@
+import { CELL_SIZE } from '$lib/constants';
 import { SmoothGraphics } from '@pixi/graphics-smooth';
 
 export class Grid extends SmoothGraphics {
@@ -5,7 +6,7 @@ export class Grid extends SmoothGraphics {
 
 	constructor(
 		public drawBoundaries: boolean,
-		public cellSize: number = 16,
+		public cellSize: number = CELL_SIZE,
 		public useCorrectedWidth: boolean = true,
 		public _width: number = 200
 	) {
