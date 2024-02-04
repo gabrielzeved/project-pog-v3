@@ -2,6 +2,7 @@ import { Packet } from '@ppog/shared';
 import { DisconnectReason, Socket } from 'socket.io';
 import { server } from '.';
 import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
+import { Logger } from './utils/Logger';
 
 export class Client {
   constructor(
@@ -18,7 +19,7 @@ export class Client {
     this.socket.onAny((evt, data) => {
       try {
         if (!this.onMessage(evt, data)) {
-          console.log('Unknown command (' + evt + '), disconnected.');
+          Logger.warning(`Unknown command (${evt}), disconnected.`);
           this.disconnect();
         }
       } catch (err) {

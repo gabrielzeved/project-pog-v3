@@ -1,9 +1,10 @@
 import { PlayerInfoPacket, PlayerInfoUpdatePacket } from '@ppog/shared';
 import { server } from '../..';
 import { PlayerJoinEvent } from '../../events/player';
+import { Logger } from '../../utils/Logger';
 
 export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
-  console.log(`${evt.id} has joined`);
+  Logger.info(`${evt.id} has joined`);
 
   // TODO: spawn entity
 
