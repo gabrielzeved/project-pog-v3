@@ -6,7 +6,7 @@
 	import { Cursor } from '$lib/pixi/cursor';
 	import { generateSpritesheetData } from '$lib/pixi/generateSpritesheetData';
 	import { Grid } from '$lib/pixi/grid';
-	import { editorContext } from '$lib/store';
+	import { editorContext, type Layer } from '$lib/store';
 	import { Tilemap } from '@pixi/tilemap';
 	import { Viewport } from 'pixi-viewport';
 	import * as PIXI from 'pixi.js';
@@ -15,16 +15,20 @@
 	let container: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
 	let app: PIXI.Application;
+	let viewport: Viewport;
 	let dragging: boolean = false;
+	let tilemaps: Map<string, Tilemap> = new Map();
+	let spritesheet: PIXI.Spritesheet;
+	let asset: PIXI.Texture;
 
-	onMount(async () => {
+	async function init() {
 		app = new PIXI.Application({
 			background: '#000',
 			view: canvas,
 			resizeTo: container
 		});
 
-		const viewport = new Viewport({
+		viewport = new Viewport({
 			screenWidth: window.innerWidth,
 			screenHeight: window.innerHeight,
 			events: app.renderer.events
@@ -47,9 +51,6 @@
 				friction: 0.8
 			});
 
-		const asset = await PIXI.Assets.load('/spr_grass_tileset.png');
-		asset.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-
 		const cursor = new Cursor();
 		cursor.draw();
 
@@ -57,24 +58,6 @@
 		grid.interactive = true;
 		grid.lineStyle({ width: 1, color: 0x1e1e1e });
 		grid.drawGrid();
-
-		const tilemap = new Tilemap([asset.baseTexture]);
-
-		function drawMap() {
-			tilemap.clear();
-
-			const value = get(editorContext.store);
-
-			for (let y = 0; y < MAP_SIZE; y++) {
-				for (let x = 0; x < MAP_SIZE; x++) {
-					const tileIndex = value.map[y * MAP_SIZE + x];
-
-					if (tileIndex != null) {
-						tilemap.tile(spritesheet.textures[`${tileIndex}`], x * CELL_SIZE, y * CELL_SIZE);
-					}
-				}
-			}
-		}
 
 		viewport.interactive = true;
 		viewport.on('mousemove', (evt) => {
@@ -87,13 +70,9 @@
 
 			if (dragging) {
 				editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
-				drawMap();
+				drawLayers();
 			}
 		});
-
-		const spritesheeData = generateSpritesheetData(asset, CELL_SIZE, CELL_SIZE);
-		const spritesheet = new PIXI.Spritesheet(asset, spritesheeData);
-		await spritesheet.parse();
 
 		viewport.on('mouseup', (evt) => {
 			if (evt.button != 0) return;
@@ -109,12 +88,62 @@
 			const point = viewport.toWorld(evt.global);
 
 			editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
-			drawMap();
+			drawLayers();
 		});
 
 		viewport.addChild(grid);
-		viewport.addChild(tilemap);
 		viewport.addChild(cursor);
+
+		asset = await PIXI.Assets.load('/spr_grass_tileset.png');
+		asset.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+
+		const spritesheeData = generateSpritesheetData(asset, CELL_SIZE, CELL_SIZE);
+		spritesheet = new PIXI.Spritesheet(asset, spritesheeData);
+		await spritesheet.parse();
+	}
+
+	async function drawLayers(layersList: Layer[] = []) {
+		if (!asset) return;
+
+		for (const layer of layersList) {
+			if (tilemaps.has(layer.name)) continue;
+
+			const tilemap = new Tilemap([asset.baseTexture]);
+
+			tilemaps.set(layer.name, tilemap);
+
+			viewport.addChild(tilemap);
+		}
+
+		const value = get(editorContext.store);
+
+		for (const [key, tilemap] of tilemaps.entries()) {
+			const layer = value.layers.find((layer) => layer.name === key);
+
+			if (!layer) continue;
+
+			tilemap.clear();
+
+			for (let y = 0; y < MAP_SIZE; y++) {
+				for (let x = 0; x < MAP_SIZE; x++) {
+					const tileIndex = layer.map[y * MAP_SIZE + x];
+
+					if (tileIndex != null) {
+						tilemap.tile(spritesheet.textures[`${tileIndex}`], x * CELL_SIZE, y * CELL_SIZE);
+					}
+				}
+			}
+		}
+	}
+
+	const store = editorContext.store;
+
+	$: {
+		drawLayers($store.layers);
+	}
+
+	onMount(async () => {
+		await init();
 	});
 </script>
 
