@@ -5,4 +5,7 @@ import { Client } from './network/Client';
 export const client = new Client();
 
 // Game App
-export const gameApp = new GameApp();
+export const gameApp = new GameApp({
+	view: document.getElementById('app') as HTMLCanvasElement,
+	backgroundColor: 'yellow'
+});

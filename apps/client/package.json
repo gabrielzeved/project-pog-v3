@@ -16,6 +16,7 @@
 	},
 	"dependencies": {
 		"@ppog/shared": "*",
+		"pixi.js": "^7.4.0",
 		"socket.io-client": "^4.7.4"
 	},
 	"devDependencies": {
