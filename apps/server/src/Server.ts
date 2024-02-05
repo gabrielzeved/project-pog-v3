@@ -48,9 +48,7 @@ export class Server {
   }
 
   sendPacketToAll(packet: Packet) {
-    this.clients.forEach((client) => {
-      client.sendPacket(packet);
-    });
+    this.socket.emit(packet.name, packet);
   }
 
   sendPacketToAllBut(packet: Packet, id: string) {

@@ -4,7 +4,7 @@ import { PlayerDisconnectEvent } from '../../events/player';
 import { Logger } from '../../utils/Logger';
 
 export function PlayerDisconnectEventListener(evt: PlayerDisconnectEvent) {
-  Logger.info(`${evt.id} has disconnected (reason: ${evt.reason})`);
+  server.gameManager.destroyEntity(evt.id);
   server.removeClient(evt.id);
 
   // Send connected players to everyone
@@ -12,4 +12,6 @@ export function PlayerDisconnectEventListener(evt: PlayerDisconnectEvent) {
     new ClientPackets.PlayerInfoUpdatePacket({ clients: server.getAllClients() }),
     evt.id
   );
+
+  Logger.info(`${evt.id} has disconnected (reason: ${evt.reason})`);
 }

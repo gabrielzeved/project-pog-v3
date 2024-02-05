@@ -9,6 +9,7 @@ export class GameEntity extends Entity {
 		super(id, position, spritePath);
 
 		this.sprite = this.loadSprite(spritePath);
+		this.sprite.name = id;
 		this.sprite.anchor.set(0.5);
 		this.sprite.x = position.x;
 		this.sprite.y = position.y;

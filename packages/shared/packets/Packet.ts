@@ -2,7 +2,8 @@ export enum PacketType {
   CHAT_MESSAGE = 'chat.message',
   PLAYER_INFO = 'player.info',
   PLAYER_INFO_UPDATE = 'player.info.update',
-  ENTITY_SPAWN = 'entity.spawn'
+  ENTITY_SPAWN = 'entity.spawn',
+  ENTITY_DESTROY = 'entity.destroy'
 }
 
 export abstract class Packet {

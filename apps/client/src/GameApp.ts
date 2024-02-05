@@ -1,11 +1,10 @@
 import * as PIXI from 'pixi.js';
-import { Entity } from '@ppog/shared';
 import { writable } from 'svelte/store';
 import type { GameEntity } from './entities/GameEntity';
 
 export class GameApp {
 	private app: PIXI.Application;
-	private entities: Entity[] = [];
+	private entities: GameEntity[] = [];
 	public connectedClients = writable<string[]>([]);
 
 	constructor(options: Partial<PIXI.IApplicationOptions>) {
@@ -25,14 +24,17 @@ export class GameApp {
 
 	addEntity(entity: GameEntity) {
 		this.entities.push(entity);
+		this.app.stage.addChild(entity.sprite);
 
-		entity.sprite && this.app.stage.addChild(entity.sprite);
+		this.app.stage.getChildByName('');
 	}
 
 	destroyEntity(id: string) {
 		const index = this.entities.findIndex((entity) => entity.id === id);
 		if (index === -1) return;
+		const entity = this.entities[index];
 		this.entities.splice(index, 1);
+		entity.sprite.destroy();
 	}
 
 	private gameLoop() {
