@@ -1,10 +1,11 @@
 import * as PIXI from 'pixi.js';
-import { writable } from 'svelte/store';
 import type { GameEntity } from './entities/GameEntity';
-
+import { writable } from 'svelte/store';
+import InputKeyboardManager from './engine/InputKeyboardManager';
 export class GameApp {
 	private app: PIXI.Application;
 	private entities: GameEntity[] = [];
+	public keyboardManager: InputKeyboardManager;
 	public connectedClients = writable<string[]>([]);
 
 	constructor(options: Partial<PIXI.IApplicationOptions>) {
@@ -14,7 +15,19 @@ export class GameApp {
 		window.addEventListener('resize', (e) => {
 			this.app.renderer.resize(window.innerWidth, window.innerHeight);
 		});
-		this.app.ticker.add(() => this.gameLoop());
+
+		this.keyboardManager = new InputKeyboardManager(
+			{
+				UP: 'w',
+				DOWN: 's',
+				RIGHT: 'd',
+				LEFT: 'a',
+				SPACE: ' '
+			},
+			this.app
+		);
+
+		this.app.ticker.add((dt) => this.gameLoop(dt));
 		this.app.start();
 	}
 
@@ -24,9 +37,7 @@ export class GameApp {
 
 	addEntity(entity: GameEntity) {
 		this.entities.push(entity);
-		this.app.stage.addChild(entity.sprite);
-
-		this.app.stage.getChildByName('');
+		this.app.stage.addChild(entity);
 	}
 
 	destroyEntity(id: string) {
@@ -34,10 +45,10 @@ export class GameApp {
 		if (index === -1) return;
 		const entity = this.entities[index];
 		this.entities.splice(index, 1);
-		entity.sprite.destroy();
+		entity.kill();
 	}
 
-	private gameLoop() {
+	private gameLoop(deltaTime: number) {
 		// do something
 	}
 }

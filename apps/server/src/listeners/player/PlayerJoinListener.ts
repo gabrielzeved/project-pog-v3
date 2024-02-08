@@ -1,14 +1,16 @@
-import { ClientPackets, Player } from '@ppog/shared';
+import { ClientPackets } from '@ppog/shared';
 import { server } from '../..';
 import { PlayerJoinEvent } from '../../events/player';
 import { Logger } from '../../utils/Logger';
+import { WorldEntity } from '../../entities/WorldEntity';
 
 export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
-  const entity = new Player(
+  const entity = new WorldEntity(
     evt.id,
+    'Gayble',
     {
-      x: Math.floor(Math.random() * 350),
-      y: Math.floor(Math.random() * 350)
+      x: Math.floor(Math.random() * 750),
+      y: Math.floor(Math.random() * 750)
     },
     'assets/player/texture.png'
   );
@@ -27,12 +29,20 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   );
 
   // send spawned entities to the player
-  for (let entity of server.gameManager.getAllEntities()) {
-    client.sendPacket(new ClientPackets.EntitySpawnPacket(entity));
+  for (let { id, name, position, spritePath } of server.gameManager.getAllEntities()) {
+    client.sendPacket(new ClientPackets.EntitySpawnPacket({ id, name, position, spritePath }));
   }
 
   // send player entity to already connected players
-  server.sendPacketToAllBut(new ClientPackets.EntitySpawnPacket(playerEntity), evt.id);
+  server.sendPacketToAllBut(
+    new ClientPackets.EntitySpawnPacket({
+      id: playerEntity.id,
+      name: playerEntity.name,
+      position: playerEntity.position,
+      spritePath: playerEntity.spritePath
+    }),
+    evt.id
+  );
 
   // send connected players list
   server.sendPacketToAll(

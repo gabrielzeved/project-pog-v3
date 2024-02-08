@@ -6,9 +6,6 @@
   "scripts": {
     "lint": "eslint ."
   },
-  "dependencies": {
-    "pixi.js": "^7.4.0"
-  },
   "devDependencies": {
     "@ppog/config": "*",
     "svelte": "^4.2.8"

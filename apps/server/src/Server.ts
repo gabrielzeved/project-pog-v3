@@ -1,4 +1,4 @@
-import { Packet, PacketType, Player } from '@ppog/shared';
+import { Packet, PacketType } from '@ppog/shared';
 import { Server as SocketServer } from 'socket.io';
 import { v4 } from 'uuid';
 import { Client } from './Client';
@@ -103,12 +103,12 @@ export class Server {
   onPacket(client: Client, evt: string, data: any): boolean {
     switch (evt) {
       case PacketType.CHAT_MESSAGE:
-        this.queueEvent(
-          new PlayerChatEvent(
-            new Player(client.entityId, { x: 10, y: 10 }, 'assets/player/texture.png'),
-            data.message
-          )
-        );
+        // this.queueEvent(
+        //   new PlayerChatEvent(
+        //     new Player(client.entityId, { x: 10, y: 10 }, 'assets/player/texture.png'),
+        //     data.message
+        //   )
+        // );
         break;
       default:
         return false;
