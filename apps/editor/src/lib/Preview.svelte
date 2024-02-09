@@ -3,10 +3,10 @@
 	import '../app.css';
 
 	import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
+	import { AutoTile } from '$lib/pixi/autotile';
 	import { Cursor } from '$lib/pixi/cursor';
-	import { generateSpritesheetData } from '$lib/pixi/generateSpritesheetData';
 	import { Grid } from '$lib/pixi/grid';
-	import { editorContext, type Layer } from '$lib/store';
+	import { asset, editorContext, initTextures, textures, type Layer } from '$lib/store';
 	import { Tilemap } from '@pixi/tilemap';
 	import { Viewport } from 'pixi-viewport';
 	import * as PIXI from 'pixi.js';
@@ -16,12 +16,14 @@
 	let canvas: HTMLCanvasElement;
 	let app: PIXI.Application;
 	let viewport: Viewport;
-	let dragging: boolean = false;
 	let tilemaps: Map<string, Tilemap> = new Map();
-	let spritesheet: PIXI.Spritesheet;
-	let asset: PIXI.Texture;
+
+	let leftButton: boolean = false;
+	let rightButton: boolean = false;
 
 	async function init() {
+		await initTextures();
+
 		app = new PIXI.Application({
 			background: '#000',
 			view: canvas,
@@ -68,38 +70,48 @@
 			);
 			cursor.position.set(newPoint.x, newPoint.y);
 
-			if (dragging) {
+			if (leftButton) {
 				editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+				drawLayers();
+			} else if (rightButton) {
+				editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
 				drawLayers();
 			}
 		});
 
 		viewport.on('mouseup', (evt) => {
-			if (evt.button != 0) return;
-
-			dragging = false;
+			leftButton = false;
 		});
 
 		viewport.on('mousedown', (evt) => {
 			if (evt.button != 0) return;
-
-			dragging = true;
-
 			const point = viewport.toWorld(evt.global);
 
 			editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
 			drawLayers();
+			leftButton = true;
+		});
+
+		viewport.on('rightdown', (evt) => {
+			rightButton = true;
+			const point = viewport.toWorld(evt.global);
+
+			editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			drawLayers();
+		});
+
+		viewport.on('rightup', (evt) => {
+			rightButton = false;
 		});
 
 		viewport.addChild(grid);
 		viewport.addChild(cursor);
 
-		asset = await PIXI.Assets.load('/spr_grass_tileset.png');
-		asset.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
+		drawLayers($store.layers);
 
-		const spritesheeData = generateSpritesheetData(asset, CELL_SIZE, CELL_SIZE);
-		spritesheet = new PIXI.Spritesheet(asset, spritesheeData);
-		await spritesheet.parse();
+		canvas.addEventListener('contextmenu', (e) => {
+			e.preventDefault();
+		});
 	}
 
 	async function drawLayers(layersList: Layer[] = []) {
@@ -118,18 +130,28 @@
 		const value = get(editorContext.store);
 
 		for (const [key, tilemap] of tilemaps.entries()) {
+			tilemap.clear();
+
 			const layer = value.layers.find((layer) => layer.name === key);
 
 			if (!layer) continue;
-
-			tilemap.clear();
+			if (!layer.visible) continue;
 
 			for (let y = 0; y < MAP_SIZE; y++) {
 				for (let x = 0; x < MAP_SIZE; x++) {
-					const tileIndex = layer.map[y * MAP_SIZE + x];
+					const tile = layer.map[y * MAP_SIZE + x];
 
-					if (tileIndex != null) {
-						tilemap.tile(spritesheet.textures[`${tileIndex}`], x * CELL_SIZE, y * CELL_SIZE);
+					if (tile != null) {
+						if (tile instanceof AutoTile) {
+							tilemap.tile(
+								textures[`${tile.determineTile(x, y, layer.map)}`],
+								x * CELL_SIZE,
+								y * CELL_SIZE
+							);
+							continue;
+						}
+
+						tilemap.tile(textures[`${tile}`], x * CELL_SIZE, y * CELL_SIZE);
 					}
 				}
 			}

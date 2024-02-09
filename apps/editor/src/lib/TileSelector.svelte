@@ -4,9 +4,15 @@
 
 	import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
 	import { Cursor } from '$lib/pixi/cursor';
-	import { generateSpritesheetData } from '$lib/pixi/generateSpritesheetData';
 	import { Grid } from '$lib/pixi/grid';
-	import { editorContext } from '$lib/store';
+	import {
+		asset,
+		editorContext,
+		initTextures,
+		textureCols,
+		textureRows,
+		textures
+	} from '$lib/store';
 	import { Tilemap } from '@pixi/tilemap';
 	import { Viewport } from 'pixi-viewport';
 	import * as PIXI from 'pixi.js';
@@ -17,6 +23,8 @@
 	let startingPoint: PIXI.Point;
 
 	onMount(async () => {
+		await initTextures();
+
 		app = new PIXI.Application({
 			background: '#000',
 			width: 400,
@@ -49,20 +57,18 @@
 				friction: 0.8
 			});
 
-		const asset = await PIXI.Assets.load('/spr_grass_tileset.png');
-		asset.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
-
 		const tilemap = new Tilemap([asset.baseTexture]);
 
-		const spritesheeData = generateSpritesheetData(asset, CELL_SIZE, CELL_SIZE);
-		const spritesheet = new PIXI.Spritesheet(asset, spritesheeData);
-		await spritesheet.parse();
-		const cellXCount = asset.baseTexture.width / CELL_SIZE;
-		const cellYCount = asset.baseTexture.height / CELL_SIZE;
+		const width = textureCols;
+		const height = textureRows;
 
-		for (let y = 0; y < cellYCount; y++) {
-			for (let x = 0; x < cellXCount; x++) {
-				tilemap.tile(spritesheet.textures[`${y * cellYCount + x}`], x * CELL_SIZE, y * CELL_SIZE);
+		for (let row = 0; row < height; row++) {
+			for (let col = 0; col < width; col++) {
+				if (!textures[row * width + col]) {
+					console.log(row * width + col);
+				}
+
+				tilemap.tile(textures[row * width + col], col * CELL_SIZE, row * CELL_SIZE);
 			}
 		}
 
@@ -118,7 +124,7 @@
 
 			startingPoint = newPoint;
 
-			const tileIndex = newPoint.y * cellYCount + newPoint.x;
+			const tileIndex = newPoint.y * textureCols + newPoint.x;
 			editorContext.setSelectedTiles([[tileIndex]]);
 			selectedCursor.position.set(startingPoint.x * CELL_SIZE, startingPoint.y * CELL_SIZE);
 
@@ -153,7 +159,7 @@
 			for (let x = minPoint.x; x <= maxPoint.x; x++) {
 				const col = [];
 				for (let y = minPoint.y; y <= maxPoint.y; y++) {
-					const tileIndex = y * cellYCount + x;
+					const tileIndex = y * textureCols + x;
 
 					col.push(tileIndex);
 				}
@@ -175,4 +181,6 @@
 	});
 </script>
 
-<canvas bind:this={canvas}></canvas>
+<div class="p-4 border border-elevation1 rounded">
+	<canvas bind:this={canvas}></canvas>
+</div>
