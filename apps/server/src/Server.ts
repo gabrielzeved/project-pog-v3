@@ -23,7 +23,7 @@ export class Server {
   private clients: Map<string, Client> = new Map();
   private eventQueue: EventQueue = new EventQueue();
   private listeners: Map<EventClass, ListenerFunction[]> = new Map();
-  private gameManager: GameManager = new GameManager(this);
+  public gameManager: GameManager = new GameManager(this);
 
   private get tpms(): number {
     return this.config.tps / 1000;
@@ -48,9 +48,7 @@ export class Server {
   }
 
   sendPacketToAll(packet: Packet) {
-    this.clients.forEach((client) => {
-      client.sendPacket(packet);
-    });
+    this.socket.emit(packet.name, packet);
   }
 
   sendPacketToAllBut(packet: Packet, id: string) {
@@ -105,7 +103,12 @@ export class Server {
   onPacket(client: Client, evt: string, data: any): boolean {
     switch (evt) {
       case PacketType.CHAT_MESSAGE:
-        this.queueEvent(new PlayerChatEvent(new Player(client.entityId), data.message));
+        this.queueEvent(
+          new PlayerChatEvent(
+            new Player(client.entityId, { x: 10, y: 10 }, 'assets/player/texture.png'),
+            data.message
+          )
+        );
         break;
       default:
         return false;
