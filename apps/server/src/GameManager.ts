@@ -1,6 +1,6 @@
 import { ClientPackets } from '@ppog/shared';
-import { WorldEntity } from './entities/WorldEntity';
 import { Server } from './Server';
+import { WorldEntity } from './entities/WorldEntity';
 export class GameManager {
   private entities: WorldEntity[] = [];
 
@@ -21,12 +21,18 @@ export class GameManager {
 
   destroyEntity(entityId: string) {
     // this.server.queueEvent(new EntityDestroyEvent(entityId));
-    
+
     const index = this.entities.findIndex((entity) => entity.id === entityId);
     const entity = this.entities[index];
 
     this.server.sendPacketToAll(new ClientPackets.EntityDestroyPacket(entity.id));
 
     this.entities.splice(index, 1);
+  }
+
+  update(dt: number) {
+    for (const entity of this.entities) {
+      entity.update(dt);
+    }
   }
 }

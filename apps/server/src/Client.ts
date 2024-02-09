@@ -20,7 +20,7 @@ export class Client {
       try {
         if (!this.onMessage(evt, data)) {
           Logger.warning(`Unknown command (${evt}), disconnected.`);
-          this.disconnect();
+          // this.disconnect();
         }
       } catch (err) {
         console.error(err);

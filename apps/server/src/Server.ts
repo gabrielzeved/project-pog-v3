@@ -10,7 +10,10 @@ import { EventClass, ListenerFunction } from './listeners/Listener';
 import { PlayerChatEvent } from './events/chat';
 import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
 
+import { PlayerVelocityPacket } from '@ppog/shared/packets/server/player/PlayerVelocityPacket';
+import { EntityMoveEvent } from './events/entity/EntityMoveEvent';
 import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
+import { EntityMoveEventListener } from './listeners/entity/EntityMoveListener';
 import { PlayerDisconnectEventListener } from './listeners/player/PlayerDisconnectListener';
 import { PlayerJoinEventListener } from './listeners/player/PlayerJoinListener';
 import { Logger } from './utils/Logger';
@@ -32,7 +35,7 @@ export class Server {
   constructor(
     public socket: SocketServer,
     public config: ServerConfig = {
-      tps: 30
+      tps: 20
     }
   ) {
     this.setup();
@@ -74,6 +77,7 @@ export class Server {
     this.addListener(PlayerJoinEvent, PlayerJoinEventListener);
     this.addListener(PlayerDisconnectEvent, PlayerDisconnectEventListener);
     this.addListener(PlayerChatEvent, PlayerChatEventListener);
+    this.addListener(EntityMoveEvent, EntityMoveEventListener);
   }
 
   addListener(evt: EventClass, listener: ListenerFunction) {
@@ -110,6 +114,13 @@ export class Server {
         //   )
         // );
         break;
+      case PacketType.PLAYER_VELOCITY:
+        const packet = data as PlayerVelocityPacket;
+        const entity = this.gameManager.getEntity(packet.id);
+        if (entity) {
+          entity.velocity = packet.velocity;
+        }
+        break;
       default:
         return false;
     }
@@ -127,7 +138,8 @@ export class Server {
     setTimeout(() => {
       this.loop(t2);
     }, this.tpms);
-    // const delta = (t2 - t1) * 0.001;
+    const delta = (t2 - t1) * 0.001;
+    this.gameManager.update(delta);
     this.processEvents();
   }
 }

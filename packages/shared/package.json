@@ -9,5 +9,8 @@
   "devDependencies": {
     "@ppog/config": "*",
     "svelte": "^4.2.8"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.3"
   }
 }

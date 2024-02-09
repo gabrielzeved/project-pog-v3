@@ -1,10 +1,10 @@
-import { Vector2 } from '../../../types';
+import { vec2 } from 'gl-matrix';
 import { Packet, PacketType } from '../../Packet';
 
 export interface EntitySpawnPacketData {
   id: string;
   name: string;
-  position: Vector2;
+  position: vec2;
   spritePath: string;
 }
 

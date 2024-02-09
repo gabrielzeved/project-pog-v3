@@ -1,17 +1,15 @@
 import { ClientPackets } from '@ppog/shared';
 import { server } from '../..';
+import { WorldEntity } from '../../entities/WorldEntity';
 import { PlayerJoinEvent } from '../../events/player';
 import { Logger } from '../../utils/Logger';
-import { WorldEntity } from '../../entities/WorldEntity';
 
 export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   const entity = new WorldEntity(
     evt.id,
     'Gayble',
-    {
-      x: Math.floor(Math.random() * 750),
-      y: Math.floor(Math.random() * 750)
-    },
+    [Math.floor(Math.random() * 750), Math.floor(Math.random() * 750)],
+    [0, 0],
     'assets/player/texture.png'
   );
 

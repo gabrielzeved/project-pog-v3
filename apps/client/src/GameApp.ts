@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
-import type { GameEntity } from './entities/GameEntity';
 import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
+import type { GameEntity } from './entities/GameEntity';
 export class GameApp {
 	private app: PIXI.Application;
 	private entities: GameEntity[] = [];
@@ -49,6 +49,8 @@ export class GameApp {
 	}
 
 	private gameLoop(deltaTime: number) {
-		// do something
+		for (const entity of this.entities) {
+			entity.update(deltaTime);
+		}
 	}
 }

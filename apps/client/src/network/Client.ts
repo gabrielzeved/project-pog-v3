@@ -19,7 +19,7 @@ export class Client {
 			try {
 				if (!this.onMessage(evt, data)) {
 					console.log('Unknown command (' + evt + '), disconnected.');
-					this.socket.disconnect();
+					// this.socket.disconnect();
 				}
 			} catch (err) {
 				console.error(err);

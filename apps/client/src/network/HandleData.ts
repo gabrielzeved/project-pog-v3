@@ -1,10 +1,11 @@
 import { PacketType } from '@ppog/shared';
 import type { Client } from './Client';
+import ChatMessagePacketEvent from './events/ChatMessagePacketEvent';
+import EntityDestroyPacketEvent from './events/EntityDestroyPacketEvent';
+import EntityMovePacketEvent from './events/EntityMovePacketEvent';
+import EntitySpawnPacketEvent from './events/EntitySpawnPacketEvent';
 import PlayerInfoPacketEvent from './events/PlayerInfoPacketEvent';
 import PlayerInfoUpdatePacketEvent from './events/PlayerInfoUpdatePacketEvent';
-import ChatMessagePacketEvent from './events/ChatMessagePacketEvent';
-import EntitySpawnPacketEvent from './events/EntitySpawnPacketEvent';
-import EntityDestroyPacketEvent from './events/EntityDestroyPacketEvent';
 
 export class HandleData {
 	onPacket(client: Client, evt: string, data: any): boolean {
@@ -23,6 +24,9 @@ export class HandleData {
 				break;
 			case PacketType.ENTITY_DESTROY:
 				EntityDestroyPacketEvent(client, data);
+				break;
+			case PacketType.ENTITY_MOVE:
+				EntityMovePacketEvent(client, data);
 				break;
 			default:
 				return false;
