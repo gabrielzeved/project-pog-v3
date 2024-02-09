@@ -35,6 +35,7 @@
 		if (typeof value === 'number') {
 			const base64Image = await getBase64TileTexture(textures[value], 44, 44);
 			tileRenderer.src = base64Image;
+			rule.tile = value;
 		}
 	}
 
