@@ -10,7 +10,7 @@ export class PlayerEntity extends GameEntity {
 		this.addComponent(new SpriteComponent(this, spritePath));
 
 		if (this.id === client.entityId) {
-			this.addComponent(new PlayerControllerComponent());
+			// this.addComponent(new PlayerControllerComponent());
 		} else {
 			// this.addComponent(new NetworkEntityController());
 		}
