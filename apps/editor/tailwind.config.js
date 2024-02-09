@@ -2,6 +2,9 @@
 export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
+    fontFamily: {
+      mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Roboto Mono', 'monospace']
+    },
 		extend: {
 			colors: {
 				elevation1: '#292d39',
@@ -13,7 +16,10 @@ export default {
 				highlight1: '#535760',
 				highlight2: '#8c92a4',
 				highlight3: '#fefefe',
-				vivid1: '#ffcc00'
+				vivid1: '#ffcc00',
+				error1: '#DB3D3D',
+				error2: '#F64545',
+				error3: '#FF5C5C'
 			},
 			boxShadow: {
 				default:

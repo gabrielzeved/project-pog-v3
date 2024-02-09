@@ -41,6 +41,7 @@
 		"classnames": "^2.5.1",
 		"lucide-svelte": "^0.321.0",
 		"pixi-viewport": "^5.0.2",
-		"pixi.js": "^7.4.0"
+		"pixi.js": "^7.4.0",
+		"svelte-moveable": "^0.45.0"
 	}
 }
