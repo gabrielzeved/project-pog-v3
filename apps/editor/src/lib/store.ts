@@ -79,13 +79,22 @@ const editorContext = {
 				}
 			}
 
-			const newSelectedTiles = state.selectedTiles.map(function (arr) {
-				return arr.slice();
-			});
+			return {
+				...state
+			};
+		});
+	},
+	removeTile(x: number, y: number) {
+		if (x >= MAP_SIZE || y >= MAP_SIZE || x < 0 || y < 0) return;
+
+		store.update((state) => {
+			const layer = state.layers.find((item) => item.name === state.currentLayer);
+
+			const index = y * MAP_SIZE + x;
+			layer!.map[index] = null;
 
 			return {
-				...state,
-				selectedTiles: newSelectedTiles
+				...state
 			};
 		});
 	},
@@ -142,6 +151,14 @@ const editorContext = {
 			return {
 				...state,
 				autotiles: [...state.autotiles, newAutotile]
+			};
+		});
+	},
+	deleteAutotile(tile: number) {
+		store.update((state) => {
+			return {
+				...state,
+				autotiles: state.autotiles.filter((autotile) => autotile.tile !== tile)
 			};
 		});
 	}

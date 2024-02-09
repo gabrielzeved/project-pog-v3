@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { getBase64TileTexture } from '$lib/pixi/utils';
 	import { editorContext, textures } from '$lib/store';
-	import * as PIXI from 'pixi.js';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	import { AutoTile, type Direction, type Rule } from '../pixi/autotile';
@@ -29,39 +29,18 @@
 		rule.differentMask = AutoTile.mask(selectedDifferentDirections);
 	}
 
-	async function getBase64TileTexture(texture: PIXI.Texture) {
-		const renderer = PIXI.autoDetectRenderer();
-		const renderTexture = PIXI.RenderTexture.create({
-			width: 44,
-			height: 44
-		});
-
-		const spr = PIXI.Sprite.from(texture);
-		spr.width = 44;
-		spr.height = 44;
-		renderer.render(spr, { renderTexture });
-
-		const base64Image = await renderer.extract.base64(renderTexture);
-
-		renderTexture.destroy();
-		spr.destroy();
-		renderer.destroy();
-
-		return base64Image;
-	}
-
 	async function onClick() {
 		const value = get(editorContext.store).selectedTiles[0][0];
 
 		if (typeof value === 'number') {
-			const base64Image = await getBase64TileTexture(textures[value]);
+			const base64Image = await getBase64TileTexture(textures[value], 44, 44);
 			tileRenderer.src = base64Image;
 		}
 	}
 
 	async function init() {
 		if (rule.tile != -1) {
-			const base64Image = await getBase64TileTexture(textures[rule.tile]);
+			const base64Image = await getBase64TileTexture(textures[rule.tile], 44, 44);
 			tileRenderer.src = base64Image;
 		}
 	}

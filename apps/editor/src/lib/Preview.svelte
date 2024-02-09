@@ -16,8 +16,10 @@
 	let canvas: HTMLCanvasElement;
 	let app: PIXI.Application;
 	let viewport: Viewport;
-	let dragging: boolean = false;
 	let tilemaps: Map<string, Tilemap> = new Map();
+
+	let leftButton: boolean = false;
+	let rightButton: boolean = false;
 
 	async function init() {
 		await initTextures();
@@ -68,33 +70,48 @@
 			);
 			cursor.position.set(newPoint.x, newPoint.y);
 
-			if (dragging) {
+			if (leftButton) {
 				editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+				drawLayers();
+			} else if (rightButton) {
+				editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
 				drawLayers();
 			}
 		});
 
 		viewport.on('mouseup', (evt) => {
-			if (evt.button != 0) return;
-
-			dragging = false;
+			leftButton = false;
 		});
 
 		viewport.on('mousedown', (evt) => {
 			if (evt.button != 0) return;
-
-			dragging = true;
-
 			const point = viewport.toWorld(evt.global);
 
 			editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
 			drawLayers();
+			leftButton = true;
+		});
+
+		viewport.on('rightdown', (evt) => {
+			rightButton = true;
+			const point = viewport.toWorld(evt.global);
+
+			editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			drawLayers();
+		});
+
+		viewport.on('rightup', (evt) => {
+			rightButton = false;
 		});
 
 		viewport.addChild(grid);
 		viewport.addChild(cursor);
 
 		drawLayers($store.layers);
+
+		canvas.addEventListener('contextmenu', (e) => {
+			e.preventDefault();
+		});
 	}
 
 	async function drawLayers(layersList: Layer[] = []) {

@@ -181,4 +181,6 @@
 	});
 </script>
 
-<canvas bind:this={canvas}></canvas>
+<div class="p-4 border border-elevation1 rounded">
+	<canvas bind:this={canvas}></canvas>
+</div>
