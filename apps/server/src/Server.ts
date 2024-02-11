@@ -10,7 +10,8 @@ import { EventClass, ListenerFunction } from './listeners/Listener';
 import { PlayerChatEvent } from './events/chat';
 import { PlayerDisconnectEvent, PlayerJoinEvent } from './events/player';
 
-import { PlayerVelocityPacket } from '@ppog/shared/packets/server/player/PlayerVelocityPacket';
+import { TPS } from '@ppog/shared';
+import { PlayerMovePacket } from '@ppog/shared/packets/server/player/PlayerMovePacket';
 import { EntityMoveEvent } from './events/entity/EntityMoveEvent';
 import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
 import { EntityMoveEventListener } from './listeners/entity/EntityMoveListener';
@@ -29,13 +30,13 @@ export class Server {
   public gameManager: GameManager = new GameManager(this);
 
   private get tpms(): number {
-    return this.config.tps / 1000;
+    return 1000 / this.config.tps;
   }
 
   constructor(
     public socket: SocketServer,
     public config: ServerConfig = {
-      tps: 20
+      tps: TPS
     }
   ) {
     this.setup();
@@ -114,12 +115,15 @@ export class Server {
         //   )
         // );
         break;
-      case PacketType.PLAYER_VELOCITY:
-        const packet = data as PlayerVelocityPacket;
-        const entity = this.gameManager.getEntity(packet.id);
+      case PacketType.PLAYER_MOVE:
+        const packet = data as PlayerMovePacket;
+        const entity = this.gameManager.getEntity(client.entityId);
+
         if (entity) {
-          entity.velocity = packet.velocity;
+          const event = new EntityMoveEvent(entity, packet.direction, packet.delta, packet.tick);
+          this.queueEvent(event);
         }
+
         break;
       default:
         return false;

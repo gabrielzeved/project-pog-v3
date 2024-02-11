@@ -1,7 +1,7 @@
 import { ChatMessagePacket } from './chat';
-import { PlayerVelocityPacket } from './player/PlayerVelocityPacket';
+import { PlayerMovePacket } from './player/PlayerMovePacket';
 
 export const ServerPackets = {
   ChatMessagePacket,
-  PlayerVelocityPacket
+  PlayerMovePacket
 };

@@ -4,8 +4,8 @@ export enum PacketType {
   PLAYER_INFO_UPDATE = 'player.info.update',
   ENTITY_SPAWN = 'entity.spawn',
   ENTITY_DESTROY = 'entity.destroy',
-  PLAYER_VELOCITY = 'player.velocity',
-  ENTITY_MOVE = 'entity.move'
+  PLAYER_MOVE = 'player.move',
+  ENTITY_SNAPSHOT = 'entity.snapshot'
 }
 
 export abstract class Packet {

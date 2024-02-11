@@ -3,6 +3,7 @@ import { Server } from './Server';
 import { WorldEntity } from './entities/WorldEntity';
 export class GameManager {
   private entities: WorldEntity[] = [];
+  public tick: number = 0;
 
   constructor(private server: Server) {}
 
@@ -25,12 +26,15 @@ export class GameManager {
     const index = this.entities.findIndex((entity) => entity.id === entityId);
     const entity = this.entities[index];
 
+    if (!entity) return;
+
     this.server.sendPacketToAll(new ClientPackets.EntityDestroyPacket(entity.id));
 
     this.entities.splice(index, 1);
   }
 
   update(dt: number) {
+    this.tick++;
     for (const entity of this.entities) {
       entity.update(dt);
     }

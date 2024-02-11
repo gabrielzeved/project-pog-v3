@@ -1,6 +1,6 @@
 import { ChatMessagePacket } from './chat';
 import { EntityDestroyPacket, EntitySpawnPacket } from './entities';
-import { EntityMovePacket } from './entities/EntityMovePacket';
+import { EntitySnapshotPacket } from './entities/EntitySnapshotPacket';
 import { PlayerInfoPacket, PlayerInfoUpdatePacket } from './player';
 
 export const ClientPackets = {
@@ -9,5 +9,5 @@ export const ClientPackets = {
   ChatMessagePacket,
   EntitySpawnPacket,
   EntityDestroyPacket,
-  EntityMovePacket
+  EntitySnapshotPacket
 };

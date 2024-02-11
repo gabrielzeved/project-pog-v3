@@ -7,8 +7,9 @@ export class EntityMoveEvent extends Event {
 
   constructor(
     public entity: WorldEntity,
-    public from: vec2,
-    public to: vec2
+    public direction: vec2,
+    public delta: number,
+    public tick: number
   ) {
     super();
   }

@@ -27,7 +27,7 @@ export class GameApp {
 			this.app
 		);
 
-		this.app.ticker.add((dt) => this.gameLoop(dt));
+		this.app.ticker.add(() => this.gameLoop(this.app.ticker.elapsedMS / 1000));
 		this.app.start();
 	}
 
