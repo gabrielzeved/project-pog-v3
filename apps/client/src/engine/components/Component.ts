@@ -2,7 +2,8 @@ import type { GameEntity } from '../../entities/GameEntity';
 
 export enum ComponentNames {
 	Sprite = 'SpriteComponent',
-	PlayerController = 'PlayerControllerComponent'
+	PlayerController = 'PlayerControllerComponent',
+	NetworkEntity = 'NetworkEntityComponent'
 }
 
 export class Component {

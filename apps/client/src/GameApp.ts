@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
 import type { GameEntity } from './entities/GameEntity';
+import './utils/math';
 export class GameApp {
 	private app: PIXI.Application;
 	private entities: GameEntity[] = [];

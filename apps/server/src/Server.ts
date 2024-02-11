@@ -143,7 +143,7 @@ export class Server {
       this.loop(t2);
     }, this.tpms);
     const delta = (t2 - t1) * 0.001;
-    this.gameManager.update(delta);
     this.processEvents();
+    this.gameManager.update(delta);
   }
 }

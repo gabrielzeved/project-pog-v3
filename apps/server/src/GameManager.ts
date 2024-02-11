@@ -1,5 +1,7 @@
 import { ClientPackets } from '@ppog/shared';
+import { EntitySnapshotPacket } from '@ppog/shared/packets/client/entities/EntitySnapshotPacket';
 import { Server } from './Server';
+import { PlayerEntity } from './entities/PlayerEntity';
 import { WorldEntity } from './entities/WorldEntity';
 export class GameManager {
   private entities: WorldEntity[] = [];
@@ -37,6 +39,15 @@ export class GameManager {
     this.tick++;
     for (const entity of this.entities) {
       entity.update(dt);
+
+      this.server.sendPacketToAll(
+        new EntitySnapshotPacket({
+          id: entity.id,
+          position: entity.position,
+          velocity: entity.velocity,
+          tick: entity instanceof PlayerEntity ? entity.lastInputSequenceNumber : 0
+        })
+      );
     }
   }
 }

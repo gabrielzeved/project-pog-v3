@@ -1,3 +1,4 @@
+import { NetworkEntityComponent } from '../engine/components/NetworkEntityComponent';
 import { PlayerControllerComponent } from '../engine/components/PlayerControllerComponent';
 import { SpriteComponent } from '../engine/components/SpriteComponent';
 import { client } from '../main';
@@ -15,7 +16,7 @@ export class PlayerEntity extends GameEntity {
 		if (this.id === client.entityId) {
 			this.addComponent(new PlayerControllerComponent(this, 5));
 		} else {
-			// this.addComponent(new NetworkEntityController());
+			this.addComponent(new NetworkEntityComponent(this));
 		}
 	}
 }

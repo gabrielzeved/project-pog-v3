@@ -25,7 +25,6 @@ export class PlayerControllerComponent extends Component {
 	private _inputSequenceNumber: number = 0;
 	private _pendingInputs: InputPayload[] = [];
 	private _lastSnapshot?: State;
-	private _lastProcessedSnapshot?: State;
 
 	constructor(entity: GameEntity, speed: number) {
 		super(entity, ComponentNames.PlayerController);
@@ -41,14 +40,6 @@ export class PlayerControllerComponent extends Component {
 
 		this.handleServerReconcillitation(this._lastSnapshot!);
 		this.applySnapshot(this._lastSnapshot!);
-
-		// if (
-		// 	this._lastSnapshot &&
-		// 	(!this._lastProcessedSnapshot || this._lastSnapshot.tick > this._lastProcessedSnapshot.tick)
-		// ) {
-		// 	this.handleServerReconciliation();
-		// }
-		// this.handleServerReconcillitation();
 	}
 
 	handleServerReconcillitation(snapshot: Snapshot) {
@@ -79,40 +70,6 @@ export class PlayerControllerComponent extends Component {
 		this.entity.setPosition(snapshot.position[0], snapshot.position[1]);
 	}
 
-	// processMovementAsServer(inputPayload: InputPayload): StatePayload {
-	// 	const newVelocity = processInput(inputPayload.direction);
-
-	// 	const newSnapshot = processSnapshot(
-	// 		{
-	// 			...this._lastSnapshot!,
-	// 			velocity: newVelocity
-	// 		},
-	// 		1 / TPS
-	// 	);
-
-	// 	return {
-	// 		tick: inputPayload.tick,
-	// 		position: newSnapshot.position
-	// 	};
-	// }
-
-	// handleServerReconciliation() {
-	// 	this._lastProcessedSnapshot = this._lastSnapshot;
-
-	// 	this.entity.setPosition(this._lastSnapshot!.position[0], this._lastSnapshot!.position[1]);
-
-	// 	let j = 0;
-	// 	while (j < this._pendingInputs.length) {
-	// 		let input = this._pendingInputs[j];
-	// 		if (input.tick < this._lastSnapshot!.tick) {
-	// 			this._pendingInputs.splice(j, 1);
-	// 		} else {
-	// 			this.processMovement(input);
-	// 			j++;
-	// 		}
-	// 	}
-	// }
-
 	update(dt: number) {
 		const input = gameApp.keyboardManager;
 
@@ -135,7 +92,6 @@ export class PlayerControllerComponent extends Component {
 
 		vec2.normalize(this.direction, direction);
 
-		// if (!vec2.equals(this._lastDirection, direction)) {
 		const packet = new ServerPackets.PlayerMovePacket(
 			this.direction,
 			this._inputSequenceNumber,
@@ -149,7 +105,6 @@ export class PlayerControllerComponent extends Component {
 			delta: dt
 		});
 		this._inputSequenceNumber++;
-		// }
 
 		const newVelocity = processInput(this.direction);
 		const predictionSnapshot = processSnapshot(

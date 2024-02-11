@@ -1,7 +1,6 @@
 import { TPS, processInput, processSnapshot } from '@ppog/shared';
-import { EntitySnapshotPacket } from '@ppog/shared/packets/client/entities/EntitySnapshotPacket';
 import { vec2 } from 'gl-matrix';
-import { server } from '../..';
+import { PlayerEntity } from '../../entities/PlayerEntity';
 import { EntityMoveEvent } from '../../events/entity/EntityMoveEvent';
 
 export function EntityMoveEventListener(evt: EntityMoveEvent) {
@@ -19,12 +18,7 @@ export function EntityMoveEventListener(evt: EntityMoveEvent) {
   evt.entity.position = snapshot.position;
   evt.entity.velocity = snapshot.velocity;
 
-  server.sendPacketToAll(
-    new EntitySnapshotPacket({
-      id: evt.entity.id,
-      position: evt.entity.position,
-      velocity: evt.entity.velocity,
-      tick: evt.tick
-    })
-  );
+  if (evt.entity instanceof PlayerEntity) {
+    evt.entity.lastInputSequenceNumber = evt.tick;
+  }
 }
