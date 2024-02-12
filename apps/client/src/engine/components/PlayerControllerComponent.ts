@@ -3,6 +3,7 @@ import type { EntitySnapshotPacketData } from '@ppog/shared/packets/client/entit
 import { vec2 } from 'gl-matrix';
 import type { GameEntity } from '../../entities/GameEntity';
 import { client, gameApp } from '../../main';
+import type { CharacterAnimationComponent } from './CharacterAnimationComponent';
 import { Component, ComponentNames } from './Component';
 
 interface InputPayload {
@@ -18,7 +19,7 @@ type State = Snapshot & {
 export class PlayerControllerComponent extends Component {
 	private speed: number;
 	private velocity: vec2 = [0, 0];
-	private direction: vec2 = [0, 0];
+	public direction: vec2 = [0, 0];
 	private _lastDirection: vec2 = [0, 0];
 
 	//NETWORK
@@ -116,5 +117,9 @@ export class PlayerControllerComponent extends Component {
 		);
 
 		this.applySnapshot(predictionSnapshot);
+
+		this.entity
+			.getComponent<CharacterAnimationComponent>(ComponentNames.CharacterAnimation)
+			?.updateDirection(this.direction);
 	}
 }

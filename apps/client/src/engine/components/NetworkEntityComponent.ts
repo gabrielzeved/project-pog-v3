@@ -1,6 +1,7 @@
 import type { EntitySnapshotPacketData } from '@ppog/shared/packets/client/entities/EntitySnapshotPacket';
 import { vec2 } from 'gl-matrix';
 import type { GameEntity } from '../../entities/GameEntity';
+import type { CharacterAnimationComponent } from './CharacterAnimationComponent';
 import { Component, ComponentNames } from './Component';
 
 interface PositionUpdate {
@@ -15,6 +16,8 @@ export class NetworkEntityComponent extends Component {
 	private _targetPos: PositionUpdate | undefined;
 	private _lastPos: PositionUpdate | undefined;
 	private _lastUpdate: number = 0.0;
+
+	private direction: vec2 = [0, 0];
 
 	constructor(entity: GameEntity) {
 		super(entity, ComponentNames.NetworkEntity);
@@ -34,6 +37,8 @@ export class NetworkEntityComponent extends Component {
 		if (this._targetPos === null) {
 			this.entity.setPosition(packet.position[0], packet.position[1]);
 		}
+
+		this.direction = packet.velocity;
 	}
 
 	update(delta: number): void {
@@ -62,8 +67,6 @@ export class NetworkEntityComponent extends Component {
 
 			const t = Math.clamp(this._targetPos.time / INTERPOLATION_DELAY, 0.0, 1.0);
 
-			console.log((this._targetPos.time - this._lastPos.time) / INTERPOLATION_DELAY, t);
-
 			const targetX = Math.lerp(this._lastPos.position[0], this._targetPos.position[0], t);
 			const targetY = Math.lerp(this._lastPos.position[1], this._targetPos.position[1], t);
 
@@ -71,5 +74,9 @@ export class NetworkEntityComponent extends Component {
 
 			this.entity.setPosition(targetPos[0], targetPos[1]);
 		}
+
+		this.entity
+			.getComponent<CharacterAnimationComponent>(ComponentNames.CharacterAnimation)
+			?.updateDirection(this.direction);
 	}
 }

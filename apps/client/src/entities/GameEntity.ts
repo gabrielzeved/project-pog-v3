@@ -3,7 +3,7 @@ import type { Component } from '../engine/components/Component';
 export abstract class GameEntity extends Container {
 	private _id!: string;
 	private _name: string;
-	private components: Map<string, Component> = new Map();
+	public components: Map<string, Component> = new Map();
 
 	constructor(name: string) {
 		super();

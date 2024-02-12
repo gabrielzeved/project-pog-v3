@@ -12,7 +12,7 @@ export class Client {
 	}
 
 	setup() {
-		this.socket = this.socket = io('ws://localhost:3000', {
+		this.socket = this.socket = io('ws://26.255.119.133:3000', {
 			transports: ['websocket']
 		});
 		this.socket.onAny((evt, data) => {

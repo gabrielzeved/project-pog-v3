@@ -11,7 +11,7 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
     [Math.floor(Math.random() * 750), Math.floor(Math.random() * 750)],
     [0, 0],
     [0, 0],
-    'assets/player/texture.png'
+    'assets/player/data.json'
   );
 
   const playerEntity = server.gameManager.spawnEntity(entity);
