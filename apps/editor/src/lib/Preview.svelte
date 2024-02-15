@@ -110,7 +110,18 @@
 			rightButton = true;
 			const point = viewport.toWorld(evt.global);
 
-			editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			const value = get(editorContext.store);
+
+			if (value.selectedTool === 'PENCIL') {
+				editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			} else if (value.selectedTool === 'BUCKET') {
+				editorContext.floodFill(
+					Math.floor(point.x / CELL_SIZE),
+					Math.floor(point.y / CELL_SIZE),
+					true
+				);
+			}
+
 			drawLayers();
 		});
 

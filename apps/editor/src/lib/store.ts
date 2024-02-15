@@ -155,39 +155,51 @@ const editorContext = {
 		});
 	},
 
-	floodFill(x: number, y: number) {
-		const deltaX = [1, -1, 0, 0];
-		const deltaY = [0, 0, 1, -1];
+	floodFill(x: number, y: number, clear = false) {
+		store.update((state) => {
+			const deltaX = [1, -1, 0, 0];
+			const deltaY = [0, 0, 1, -1];
 
-		const visited: boolean[] = [];
-		const queue: [number, number][] = [];
-		queue.push([x, y]);
+			const visited: boolean[] = [];
+			const queue: [number, number][] = [];
+			queue.push([x, y]);
 
-		const state = get(editorContext.store);
+			const layerIndex = state.layers.findIndex((item) => item.name === state.currentLayer);
+			const layer = state.layers[layerIndex];
+			const layersCopy = [...state.layers];
+			layersCopy[layerIndex] = {
+				...layer
+			};
 
-		const layer = state.layers.find((item) => item.name === state.currentLayer);
+			if (!layer) return state;
 
-		if (!layer) return;
+			const targetTile = layer.map[y * MAP_SIZE + x];
 
-		const targetTile = layer.map[y * MAP_SIZE + x];
+			while (queue.length > 0) {
+				const current = queue.pop();
 
-		while (queue.length > 0) {
-			const current = queue.pop();
+				if (!current) continue;
 
-			if (!current) continue;
+				layer.map[current[1] * MAP_SIZE + current[0]] = clear ? null : state.selectedTiles[0][0];
 
-			editorContext.addTile(current[0], current[1]);
+				// editorContext.addTile(current[0], current[1]);
 
-			for (let i = 0; i <= 3; i++) {
-				const nextX = current[0] + deltaX[i];
-				const nextY = current[1] + deltaY[i];
+				for (let i = 0; i <= 3; i++) {
+					const nextX = current[0] + deltaX[i];
+					const nextY = current[1] + deltaY[i];
 
-				if (isValid(nextX, nextY, targetTile, layer.map, visited)) {
-					visited[nextY * MAP_SIZE + nextX] = true;
-					queue.push([nextX, nextY]);
+					if (isValid(nextX, nextY, targetTile, layer.map, visited)) {
+						visited[nextY * MAP_SIZE + nextX] = true;
+						queue.push([nextX, nextY]);
+					}
 				}
 			}
-		}
+
+			return {
+				...state,
+				layers: layersCopy
+			};
+		});
 	},
 
 	addTile(x: number, y: number) {
