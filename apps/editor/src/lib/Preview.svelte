@@ -71,7 +71,14 @@
 			cursor.position.set(newPoint.x, newPoint.y);
 
 			if (leftButton) {
-				editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+				const value = get(editorContext.store);
+
+				if (value.selectedTool === 'PENCIL') {
+					editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+				} else if (value.selectedTool === 'BUCKET') {
+					editorContext.floodFill(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+				}
+
 				drawLayers();
 			} else if (rightButton) {
 				editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
@@ -87,7 +94,14 @@
 			if (evt.button != 0) return;
 			const point = viewport.toWorld(evt.global);
 
-			editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			const value = get(editorContext.store);
+
+			if (value.selectedTool === 'PENCIL') {
+				editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			} else if (value.selectedTool === 'BUCKET') {
+				editorContext.floodFill(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
+			}
+
 			drawLayers();
 			leftButton = true;
 		});

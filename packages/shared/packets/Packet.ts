@@ -5,7 +5,8 @@ export enum PacketType {
   ENTITY_SPAWN = 'entity.spawn',
   ENTITY_DESTROY = 'entity.destroy',
   PLAYER_MOVE = 'player.move',
-  ENTITY_SNAPSHOT = 'entity.snapshot'
+  ENTITY_SNAPSHOT = 'entity.snapshot',
+  WORLD_LOAD = 'world.load'
 }
 
 export abstract class Packet {

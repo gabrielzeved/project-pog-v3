@@ -1,13 +1,14 @@
 import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
 import { AutoTile, type Tile } from '$lib/pixi/autotile';
 import type { Texture } from 'pixi.js';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 
 import * as PIXI from 'pixi.js';
 
-export type Tools = 'PENCIL' | 'BUCKET';
+export type Tool = 'PENCIL' | 'BUCKET';
 
 export interface Layer {
+	id: number;
 	name: string;
 	visible: boolean;
 	editable: boolean;
@@ -19,6 +20,27 @@ export interface EditorStore {
 	currentLayer: string;
 	layers: Layer[];
 	autotiles: AutoTile[];
+	selectedTool: Tool;
+}
+
+export function parseLayer(layer: Layer) {
+	const data: number[] = [];
+
+	for (let y = 0; y < MAP_SIZE; y++) {
+		for (let x = 0; x < MAP_SIZE; x++) {
+			const tile = layer.map[y * MAP_SIZE + x];
+
+			if (tile != null) {
+				if (tile instanceof AutoTile) {
+					data[y * MAP_SIZE + x] = tile.determineTile(x, y, layer.map);
+					continue;
+				}
+
+				data[y * MAP_SIZE + x] = tile ?? -1;
+			}
+		}
+	}
+	return data;
 }
 
 const storagedState = localStorage.getItem('pog.editor');
@@ -33,9 +55,11 @@ const initialValue = storagedState
 					editable: true,
 					visible: true,
 					map: new Array(MAP_SIZE * MAP_SIZE).fill(null),
-					name: 'Layer 1'
+					name: 'Layer 1',
+					id: 1
 				}
 			],
+			selectedTool: 'PENCIL',
 			autotiles: []
 		} as EditorStore);
 
@@ -58,10 +82,112 @@ store.subscribe((state) => {
 	localStorage.setItem('pog.editor', JSON.stringify(state));
 });
 
+function isValid(x: number, y: number, tile: Tile, map: Tile[], visited: boolean[]) {
+	if (x < 0 || x >= MAP_SIZE) return false;
+	if (y < 0 || y >= MAP_SIZE) return false;
+	if (map[y * MAP_SIZE + x] != tile || visited[y * MAP_SIZE + x]) return false;
+
+	return true;
+}
+
 const editorContext = {
 	store,
 	setSelectedTiles(tiles: Tile[][]) {
 		store.update((state) => ({ ...state, selectedTiles: tiles }));
+	},
+
+	export() {
+		const value = get(store);
+
+		const data = {
+			height: MAP_SIZE,
+			width: MAP_SIZE,
+			tileHeight: CELL_SIZE,
+			tileWidth: CELL_SIZE,
+			layers: value.layers.map((layer) => {
+				return {
+					id: layer.id,
+					data: parseLayer(layer),
+					name: layer.name,
+					visible: layer.visible,
+					objects: [],
+					properties: {}
+				};
+			}),
+			tilesets: [
+				{
+					firstId: 0,
+					image: '/spr_grass_tileset.png',
+					name: '/spr_grass_tileset.png',
+					objects: []
+				}
+			]
+		};
+
+		const fileName = 'map.json';
+
+		const saveTemplateAsFile = (filename: string, dataObjToWrite: unknown) => {
+			const blob = new Blob([JSON.stringify(dataObjToWrite)], { type: 'text/json' });
+			const link = document.createElement('a');
+
+			link.download = filename;
+			link.href = window.URL.createObjectURL(blob);
+			link.dataset.downloadurl = ['text/json', link.download, link.href].join(':');
+
+			const evt = new MouseEvent('click', {
+				view: window,
+				bubbles: true,
+				cancelable: true
+			});
+
+			link.dispatchEvent(evt);
+			link.remove();
+		};
+
+		saveTemplateAsFile(fileName, data);
+	},
+	selectTool(tool: Tool) {
+		store.update((state) => {
+			return {
+				...state,
+				selectedTool: tool
+			};
+		});
+	},
+
+	floodFill(x: number, y: number) {
+		const deltaX = [1, -1, 0, 0];
+		const deltaY = [0, 0, 1, -1];
+
+		const visited: boolean[] = [];
+		const queue: [number, number][] = [];
+		queue.push([x, y]);
+
+		const state = get(editorContext.store);
+
+		const layer = state.layers.find((item) => item.name === state.currentLayer);
+
+		if (!layer) return;
+
+		const targetTile = layer.map[y * MAP_SIZE + x];
+
+		while (queue.length > 0) {
+			const current = queue.pop();
+
+			if (!current) continue;
+
+			editorContext.addTile(current[0], current[1]);
+
+			for (let i = 0; i <= 3; i++) {
+				const nextX = current[0] + deltaX[i];
+				const nextY = current[1] + deltaY[i];
+
+				if (isValid(nextX, nextY, targetTile, layer.map, visited)) {
+					visited[nextY * MAP_SIZE + nextX] = true;
+					queue.push([nextX, nextY]);
+				}
+			}
+		}
 	},
 
 	addTile(x: number, y: number) {
@@ -102,11 +228,14 @@ const editorContext = {
 		store.update((state) => {
 			if (state.layers.some((layer) => layer.name === name)) return state;
 
+			const highestId = state.layers.reduce((prev, curr) => (curr.id < prev ? prev : curr.id), 0);
+
 			state.layers.unshift({
 				editable: true,
 				visible: true,
 				map: new Array(MAP_SIZE * MAP_SIZE).fill(null),
-				name
+				name,
+				id: highestId + 1
 			});
 			return {
 				...state
