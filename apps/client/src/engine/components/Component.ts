@@ -5,7 +5,8 @@ export enum ComponentNames {
 	PlayerController = 'PlayerControllerComponent',
 	NetworkEntity = 'NetworkEntityComponent',
 	AnimatedSprite = 'AnimatedSpriteComponent',
-	CharacterAnimation = 'CharacterAnimationComponent'
+	CharacterAnimation = 'CharacterAnimationComponent',
+	Text = 'TextComponent'
 }
 
 export class Component {
