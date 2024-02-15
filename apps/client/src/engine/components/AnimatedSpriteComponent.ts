@@ -27,15 +27,18 @@ export class AnimatedSpriteComponent extends Component {
 	sprite: PIXI.AnimatedSprite;
 	spritesheet?: PIXI.Spritesheet;
 	private currentAnimation: string;
+	onLoadCallback: (sprite: AnimatedSpriteComponent) => void;
 
 	constructor(
 		entity: GameEntity,
 		initialAnimation: string,
 		public speed: number,
-		spritesheetFile: string
+		spritesheetFile: string,
+		onLoadCallback: (sprite: AnimatedSpriteComponent) => void
 	) {
 		super(entity, ComponentNames.AnimatedSprite);
 		this.currentAnimation = initialAnimation;
+		this.onLoadCallback = onLoadCallback;
 		this.loadSpritesheet(spritesheetFile);
 	}
 
@@ -74,6 +77,7 @@ export class AnimatedSpriteComponent extends Component {
 			this.sprite.animationSpeed = this.speed;
 			this.entity.addChild(this.sprite);
 			this.sprite.play();
+			this.onLoadCallback(this);
 		});
 	}
 
@@ -100,7 +104,7 @@ export class AnimatedSpriteComponent extends Component {
 	}
 
 	isPlaying() {
-		this.sprite.playing;
+		return this.sprite.playing;
 	}
 
 	destroy() {
