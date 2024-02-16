@@ -9,7 +9,7 @@ interface PositionUpdate {
 	position: vec2;
 }
 
-const INTERPOLATION_DELAY = 0.1;
+const INTERPOLATION_DELAY = 0.05;
 
 export class NetworkEntityComponent extends Component {
 	private _updates: PositionUpdate[] = [];
