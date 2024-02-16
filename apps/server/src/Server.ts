@@ -17,7 +17,6 @@ import { PlayerChatEventListener } from './listeners/chat/ChatMessageListener';
 import { EntityMoveEventListener } from './listeners/entity/EntityMoveListener';
 import { PlayerDisconnectEventListener } from './listeners/player/PlayerDisconnectListener';
 import { PlayerJoinEventListener } from './listeners/player/PlayerJoinListener';
-import { Logger } from './utils/Logger';
 
 interface ServerConfig {
   tps: number;
@@ -98,7 +97,7 @@ export class Server {
       const newable = Object.getPrototypeOf(currentEvent).constructor;
       if (this.listeners.has(newable)) {
         this.listeners.get(newable)!.forEach((listener) => {
-          Logger.info(`${currentEvent!.name} event handled!`);
+          // Logger.info(`${currentEvent!.name} event handled!`);
           listener(currentEvent);
         });
       }

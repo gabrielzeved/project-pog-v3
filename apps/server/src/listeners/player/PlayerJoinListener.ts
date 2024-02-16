@@ -6,6 +6,7 @@ import { Logger } from '../../utils/Logger';
 
 export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   const names = ['Gayble', 'Nenemz', 'Kaikans', 'Arzok', 'SrSSS', 'leliys'];
+
   const entity = new PlayerEntity(
     evt.id,
     names[~~(Math.random() * names.length)],
@@ -14,8 +15,6 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
     [0, 0],
     'assets/player/data.json'
   );
-
-  const playerEntity = server.gameManager.spawnEntity(entity);
 
   const client = server.getClient(evt.id);
 
@@ -28,21 +27,16 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
     })
   );
 
-  // send spawned entities to the player
-  for (let { id, name, position, spritePath } of server.gameManager.getAllEntities()) {
-    client.sendPacket(new ClientPackets.EntitySpawnPacket({ id, name, position, spritePath }));
-  }
+  server.gameManager.spawnEntity(entity);
 
-  // send player entity to already connected players
-  server.sendPacketToAllBut(
-    new ClientPackets.EntitySpawnPacket({
-      id: playerEntity.id,
-      name: playerEntity.name,
-      position: playerEntity.position,
-      spritePath: playerEntity.spritePath
-    }),
-    evt.id
-  );
+  // send spawned entities to the player
+  for (let { id, type, name, position, spritePath } of server.gameManager.getAllEntities()) {
+    if (id === client.entityId) continue;
+
+    client.sendPacket(
+      new ClientPackets.EntitySpawnPacket({ id, type, name, position, spritePath })
+    );
+  }
 
   // send connected players list
   server.sendPacketToAll(
