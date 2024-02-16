@@ -1,4 +1,6 @@
 <script lang="ts">
+  import '$lib/commands';
+  
 	import Preview from '$lib/Preview.svelte';
 	import TileSelector from '$lib/TileSelector.svelte';
 
