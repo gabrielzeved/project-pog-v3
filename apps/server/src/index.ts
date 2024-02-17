@@ -1,9 +1,10 @@
+import { ClientPackets } from '@ppog/shared';
 import { createServer } from 'http';
+import readline from 'readline';
 import { Server as SocketServer } from 'socket.io';
 import { Server } from './Server';
-import readline from 'readline';
+import { EnemyEntity } from './entities/EnemyEntity';
 import { Logger } from './utils/Logger';
-import { ClientPackets } from '@ppog/shared';
 
 export let server: Server;
 
@@ -41,6 +42,17 @@ function commandHandler() {
       switch (command[0]) {
         case '/help':
           console.log('Help command');
+          break;
+        case '/spawn':
+          const entity = new EnemyEntity(
+            `${Math.random() * 9999}`,
+            'Enemy',
+            [~~(Math.random() * 750), ~~(Math.random() * 750)],
+            [0, 0],
+            [0, 0],
+            'assets/enemy/data.json'
+          );
+          server.gameManager.spawnEntity(entity);
           break;
         default:
           break;

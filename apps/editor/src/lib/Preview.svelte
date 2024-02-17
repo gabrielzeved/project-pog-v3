@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import '../app.css';
 
+	import { addState } from '$lib/commands/undo';
 	import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
 	import { AutoTile } from '$lib/pixi/autotile';
 	import { Cursor } from '$lib/pixi/cursor';
@@ -92,9 +93,11 @@
 
 		viewport.on('mousedown', (evt) => {
 			if (evt.button != 0) return;
+
 			const point = viewport.toWorld(evt.global);
 
 			const value = get(editorContext.store);
+			addState(value.layers);
 
 			if (value.selectedTool === 'PENCIL') {
 				editorContext.addTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
@@ -111,6 +114,7 @@
 			const point = viewport.toWorld(evt.global);
 
 			const value = get(editorContext.store);
+			addState(value.layers);
 
 			if (value.selectedTool === 'PENCIL') {
 				editorContext.removeTile(Math.floor(point.x / CELL_SIZE), Math.floor(point.y / CELL_SIZE));
@@ -186,6 +190,7 @@
 	const store = editorContext.store;
 
 	$: {
+		console.log('dksoapkdasd');
 		drawLayers($store.layers);
 	}
 

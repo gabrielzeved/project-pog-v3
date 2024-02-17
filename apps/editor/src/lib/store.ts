@@ -1,9 +1,8 @@
 import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
 import { AutoTile, type Tile } from '$lib/pixi/autotile';
 import type { Texture } from 'pixi.js';
-import { get, writable } from 'svelte/store';
-
 import * as PIXI from 'pixi.js';
+import { get, writable } from 'svelte/store';
 
 export type Tool = 'PENCIL' | 'BUCKET';
 
@@ -60,7 +59,8 @@ const initialValue = storagedState
 				}
 			],
 			selectedTool: 'PENCIL',
-			autotiles: []
+			autotiles: [],
+			history: []
 		} as EditorStore);
 
 initialValue.autotiles = initialValue.autotiles.map((obj) =>

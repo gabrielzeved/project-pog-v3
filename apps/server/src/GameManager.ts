@@ -17,9 +17,20 @@ export class GameManager {
     return this.entities.find((entity) => entity.id === entityId);
   }
 
-  spawnEntity(entity: WorldEntity) {
+  spawnEntity<T extends WorldEntity = WorldEntity>(entity: T): T {
     this.entities.push(entity);
-    return this.entities[this.entities.length - 1];
+
+    this.server.sendPacketToAll(
+      new ClientPackets.EntitySpawnPacket({
+        id: entity.id,
+        type: entity.type,
+        name: entity.name,
+        position: entity.position,
+        spritePath: entity.spritePath
+      })
+    );
+
+    return entity;
   }
 
   destroyEntity(entityId: string) {

@@ -1,2 +1,2 @@
 export const UNIT = 16;
-export const TPS = 20;
+export const TPS = 10;
