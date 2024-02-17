@@ -1,5 +1,6 @@
 import { Container } from 'pixi.js';
 import type { Component } from '../engine/components/Component';
+import { gameApp } from '../main';
 export abstract class GameEntity extends Container {
 	private _id!: string;
 	private _name: string;
@@ -8,6 +9,7 @@ export abstract class GameEntity extends Container {
 	constructor(name: string) {
 		super();
 		this._name = name;
+		this.parentLayer = gameApp.layerManager.get('root');
 	}
 
 	get id(): string {

@@ -15,8 +15,11 @@
 		"test:unit": "vitest"
 	},
 	"dependencies": {
+		"@pixi/layers": "^2.1.0",
+		"@pixi/tilemap": "^4.1.0",
 		"@ppog/shared": "*",
 		"gl-matrix": "^3.4.3",
+		"pixi-viewport": "^5.0.2",
 		"pixi.js": "^7.4.0",
 		"socket.io-client": "^4.7.4"
 	},

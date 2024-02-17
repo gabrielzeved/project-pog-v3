@@ -6,6 +6,7 @@ import EntitySnapshotPacketEvent from './events/EntitySnapshotPacketEvent';
 import EntitySpawnPacketEvent from './events/EntitySpawnPacketEvent';
 import PlayerInfoPacketEvent from './events/PlayerInfoPacketEvent';
 import PlayerInfoUpdatePacketEvent from './events/PlayerInfoUpdatePacketEvent';
+import WorldLoadPacketEvent from './events/WorldLoadPacketEvent';
 
 export class HandleData {
 	onPacket(client: Client, evt: string, data: any): boolean {
@@ -27,6 +28,9 @@ export class HandleData {
 				break;
 			case PacketType.ENTITY_SNAPSHOT:
 				EntitySnapshotPacketEvent(client, data);
+				break;
+			case PacketType.WORLD_LOAD:
+				WorldLoadPacketEvent(client, data);
 				break;
 			default:
 				return false;

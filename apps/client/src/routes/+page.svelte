@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { client, gameApp } from '../main';
 
-	const clients = gameApp.connectedClients;
+	// const clients = gameApp.connectedClients;
 
-	let value: string = '';
+	// let value: string = '';
 
-	function sendMessage() {
-		client.sendChatMessage(value);
-	}
+	// function sendMessage() {
+	// 	client.sendChatMessage(value);
+	// }
 </script>
 
-<div>
+<!-- <div>
 	<p>Connected clients:</p>
 	<p>
 		{$clients}
@@ -19,4 +19,4 @@
 
 <label for="message">Send message</label>
 <input name="message" bind:value type="text" />
-<button on:click={sendMessage}>Enviar</button>
+<button on:click={sendMessage}>Enviar</button> -->

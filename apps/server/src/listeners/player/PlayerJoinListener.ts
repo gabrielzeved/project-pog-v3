@@ -1,8 +1,9 @@
-import { ClientPackets } from '@ppog/shared';
+import { ClientPackets, WorldData } from '@ppog/shared';
 import { server } from '../..';
 import { PlayerEntity } from '../../entities/PlayerEntity';
 import { PlayerJoinEvent } from '../../events/player';
 import { Logger } from '../../utils/Logger';
+import World from '../../assets/worlds/map.json';
 
 export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   const names = ['Gayble', 'Nenemz', 'Kaikans', 'Arzok', 'SrSSS', 'leliys'];
@@ -48,6 +49,10 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   server.sendPacketToAll(
     new ClientPackets.PlayerInfoUpdatePacket({ clients: server.getAllClients() })
   );
+
+  // load world
+  const worldMap = World as WorldData;
+  client.sendPacket(new ClientPackets.WorldLoadPacket(worldMap));
 
   Logger.info(`${evt.id} has joined`);
 }
