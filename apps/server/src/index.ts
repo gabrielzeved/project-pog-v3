@@ -1,10 +1,12 @@
 import { ClientPackets } from '@ppog/shared';
+import { program } from 'commander';
 import { createServer } from 'http';
 import readline from 'readline';
 import { Server as SocketServer } from 'socket.io';
 import { Server } from './Server';
-import { EnemyEntity } from './entities/EnemyEntity';
 import { Logger } from './utils/Logger';
+
+import './commands';
 
 export let server: Server;
 
@@ -28,6 +30,8 @@ function main() {
   server.run();
 }
 
+program.exitOverride();
+
 function commandHandler() {
   const rl = readline.createInterface({
     input: process.stdin
@@ -37,26 +41,12 @@ function commandHandler() {
 
   rl.on(`line`, (input) => {
     if (input.startsWith('/')) {
-      const command = input.split(' ');
+      const args = input.split(' ');
+      args[0] = args[0].replace('/', '');
 
-      switch (command[0]) {
-        case '/help':
-          console.log('Help command');
-          break;
-        case '/spawn':
-          const entity = new EnemyEntity(
-            `${Math.random() * 9999}`,
-            'Enemy',
-            [~~(Math.random() * 750), ~~(Math.random() * 750)],
-            [0, 0],
-            [0, 0],
-            'assets/enemy/data.json'
-          );
-          server.gameManager.spawnEntity(entity);
-          break;
-        default:
-          break;
-      }
+      try {
+        program.parse(['.', '.', ...args]);
+      } catch (e) {}
     } else {
       server.sendPacketToAll(new ClientPackets.ChatMessagePacket(input));
     }
