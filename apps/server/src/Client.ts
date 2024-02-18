@@ -1,8 +1,9 @@
-import { ClientPackets, Packet } from '@ppog/shared';
+import { ClientPackets, Packet, WorldData } from '@ppog/shared';
 import { DisconnectReason, Socket } from 'socket.io';
 import { server } from '.';
 import { PlayerEntity } from './entities/PlayerEntity';
 import { Logger } from './utils/Logger';
+import World from './assets/worlds/map.json';
 
 export class Client {
   constructor(
@@ -26,8 +27,6 @@ export class Client {
 
     if (!client) return;
 
-    Logger.info(`${this.entityId} has joined`);
-
     // send player info to the player
     client.sendPacket(
       new ClientPackets.PlayerInfoPacket({
@@ -50,6 +49,10 @@ export class Client {
     server.sendPacketToAll(
       new ClientPackets.PlayerInfoUpdatePacket({ clients: server.getAllClients() })
     );
+
+    // load world
+    const worldMap = World as WorldData;
+    client.sendPacket(new ClientPackets.WorldLoadPacket(worldMap));
 
     Logger.info(`${this.entityId} has joined`);
   }

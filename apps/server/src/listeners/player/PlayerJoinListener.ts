@@ -1,4 +1,4 @@
-import { ClientPackets, WorldData } from '@ppog/shared';
+import { ClientPackets, EntityType, WorldData } from '@ppog/shared';
 import { server } from '../..';
 import { PlayerEntity } from '../../entities/PlayerEntity';
 import { PlayerJoinEvent } from '../../events/player';
@@ -40,7 +40,8 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
       id: playerEntity.id,
       name: playerEntity.name,
       position: playerEntity.position,
-      spritePath: playerEntity.spritePath
+      spritePath: playerEntity.spritePath,
+      type: EntityType.PLAYER
     }),
     evt.id
   );
@@ -54,5 +55,5 @@ export function PlayerJoinEventListener(evt: PlayerJoinEvent) {
   const worldMap = World as WorldData;
   client.sendPacket(new ClientPackets.WorldLoadPacket(worldMap));
 
-  Logger.info(`${evt.id} has joined`);
+  Logger.info(`${evt.id} has joinedd`);
 }
