@@ -1,3 +1,4 @@
+import { vec2 } from 'gl-matrix';
 import { Packet, PacketType } from '../../Packet';
 
 export class EntityUpdateAttributesPacket extends Packet {
@@ -6,7 +7,8 @@ export class EntityUpdateAttributesPacket extends Packet {
   constructor(
     public entityId: string,
     public health: number,
-    public maxHealth: number
+    public maxHealth: number,
+    public collision: vec2
   ) {
     super();
   }

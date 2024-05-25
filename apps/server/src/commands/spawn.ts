@@ -23,7 +23,10 @@ program
       [args.x ?? ~~(Math.random() * 750), args.y ?? ~~(Math.random() * 750)],
       [0, 0],
       [0, 0],
-      'assets/enemy/data.json'
+      'assets/enemy/data.json',
+      100,
+      100,
+      [0,0]
     );
     server.gameManager.spawnEntity(entity);
   })

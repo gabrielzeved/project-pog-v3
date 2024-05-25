@@ -5,7 +5,7 @@ export default class CameraObject extends GameEntity {
 	constructor(
 		name: string,
 		private target: GameEntity,
-		private zoomLevel: number = 2,
+		private zoomLevel: number = 1,
 		private ease: number = 1
 	) {
 		super(name);
