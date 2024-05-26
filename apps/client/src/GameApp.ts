@@ -7,6 +7,7 @@ import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
 import { LayerManager } from './engine/LayerManager';
 import type { GameEntity } from './entities/GameEntity';
+import { PlayerEntity } from './entities/PlayerEntity';
 import './utils/math';
 
 export class GameApp {
@@ -52,7 +53,15 @@ export class GameApp {
 		this.room = await this.client.joinOrCreate('my_room');
 
 		this.room.state.players.onAdd((player, sessionId) => {
-			console.log('A player has joined! Their unique session id is', sessionId);
+			const entity = new PlayerEntity(sessionId, player);
+
+			entity.position.set(player.position.x, player.position.y);
+			this.addEntity(entity);
+			entity.setupEvent();
+		});
+
+		this.room.state.players.onRemove((player, sessionId) => {
+			this.destroyEntity(sessionId);
 		});
 	}
 
@@ -79,7 +88,6 @@ export class GameApp {
 
 	private gameLoop(deltaTime: number) {
 		for (const entity of this.entities) {
-			console.log(entity);
 			entity.update(deltaTime);
 		}
 	}
