@@ -8,6 +8,8 @@ import InputKeyboardManager from './engine/InputKeyboardManager';
 import { LayerManager } from './engine/LayerManager';
 import type { GameEntity } from './entities/GameEntity';
 import './utils/math';
+import { drawLayers, initTextures } from './engine/tilemap/Tilemap';
+import { PlayerEntity } from './entities/PlayerEntity';
 
 export class GameApp {
 	public app: PIXI.Application;
@@ -53,6 +55,14 @@ export class GameApp {
 
 		this.room.state.players.onAdd((player, sessionId) => {
 			console.log('A player has joined! Their unique session id is', sessionId);
+			this.addEntity(new PlayerEntity(sessionId, player.username, 'assets/player/data.json'));
+		});
+
+		this.room.onMessage('WorldLoad', async (data) => {
+			this.worldMap = data;
+
+			await initTextures(this.worldMap);
+			await drawLayers(this.worldMap.layers);
 		});
 	}
 

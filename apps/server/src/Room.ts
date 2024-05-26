@@ -1,5 +1,6 @@
-import { Player, RoomState } from '@ppog/shared';
+import { Player, RoomState, WorldData } from '@ppog/shared';
 import { Client, Room } from 'colyseus';
+import World from './assets/worlds/map.json';
 
 export class MainRoom extends Room<RoomState> {
   maxClients: number = 50;
@@ -26,6 +27,10 @@ export class MainRoom extends Room<RoomState> {
     player.position.x = Math.floor(Math.random() * 100);
     player.position.y = Math.floor(Math.random() * 100);
     this.state.players.set(client.sessionId, player);
+
+    // load world
+    const worldMap = World as WorldData;
+    client.send('WorldLoad', worldMap);
   }
 
   onLeave(client: Client, consented: boolean) {
