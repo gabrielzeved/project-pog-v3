@@ -5,6 +5,8 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     "target": "ESNext",
-    "strict": false
+    "strict": false,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   }
 }
