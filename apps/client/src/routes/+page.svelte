@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { client, gameApp } from '../main';
+	import '../main';
 
 	// const clients = gameApp.connectedClients;
 

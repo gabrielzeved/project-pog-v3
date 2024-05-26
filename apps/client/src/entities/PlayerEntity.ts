@@ -1,13 +1,9 @@
 import { Assets, BitmapText } from 'pixi.js';
 import { AnimatedSpriteComponent } from '../engine/components/AnimatedSpriteComponent';
 import { CharacterAnimationComponent } from '../engine/components/CharacterAnimationComponent';
-import { NetworkEntityComponent } from '../engine/components/NetworkEntityComponent';
-import { PlayerControllerComponent } from '../engine/components/PlayerControllerComponent';
-import { client, gameApp } from '../main';
-import { GameEntity } from './GameEntity';
 import { TextComponent } from '../engine/components/TextComponent';
 import { GameConfig } from '../utils/Config';
-import CameraObject from './CameraObject';
+import { GameEntity } from './GameEntity';
 
 export class PlayerEntity extends GameEntity {
 	constructor(id: string, playerName: string, spritesheetPath: string) {
@@ -26,15 +22,6 @@ export class PlayerEntity extends GameEntity {
 		this.addComponent(sprite);
 
 		this.addComponent(new CharacterAnimationComponent(this));
-
-		if (this.id === client.entityId) {
-			this.addComponent(new PlayerControllerComponent(this, 5));
-
-			// this.container = new CameraObject('camera', this.target, this.zoomLevel, this.ease);
-			gameApp.addEntity(new CameraObject('camera', this));
-		} else {
-			this.addComponent(new NetworkEntityComponent(this));
-		}
 	}
 
 	addPlayerNameComponent(sprite: AnimatedSpriteComponent) {

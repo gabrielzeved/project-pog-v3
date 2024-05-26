@@ -18,6 +18,7 @@
 		"@pixi/layers": "^2.1.0",
 		"@pixi/tilemap": "^4.1.0",
 		"@ppog/shared": "*",
+		"colyseus.js": "^0.15.20",
 		"gl-matrix": "^3.4.3",
 		"pixi-viewport": "^5.0.2",
 		"pixi.js": "^7.4.0",

@@ -1,12 +1,13 @@
+import { Stage } from '@pixi/layers';
+import type { Tilemap } from '@pixi/tilemap';
+import type { RoomState, WorldData } from '@ppog/shared';
+import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
 import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
+import { LayerManager } from './engine/LayerManager';
 import type { GameEntity } from './entities/GameEntity';
 import './utils/math';
-import type { WorldData } from '@ppog/shared';
-import type { Tilemap } from '@pixi/tilemap';
-import { LayerManager } from './engine/LayerManager';
-import { Stage } from '@pixi/layers';
 
 export class GameApp {
 	public app: PIXI.Application;
@@ -15,6 +16,8 @@ export class GameApp {
 	public layerManager: LayerManager = new LayerManager();
 	public connectedClients = writable<string[]>([]);
 	worldMap: WorldData;
+	public client: Client;
+	public room: Room<RoomState>;
 
 	constructor(options: Partial<PIXI.IApplicationOptions>) {
 		this.app = new PIXI.Application(options);
@@ -40,6 +43,17 @@ export class GameApp {
 
 		this.app.ticker.add(() => this.gameLoop(this.app.ticker.elapsedMS / 1000));
 		this.app.start();
+
+		this.connect();
+	}
+
+	async connect() {
+		this.client = new Client('ws://localhost:3000');
+		this.room = await this.client.joinOrCreate('my_room');
+
+		this.room.state.players.onAdd((player, sessionId) => {
+			console.log('A player has joined! Their unique session id is', sessionId);
+		});
 	}
 
 	getEntity(id: string) {
@@ -65,6 +79,7 @@ export class GameApp {
 
 	private gameLoop(deltaTime: number) {
 		for (const entity of this.entities) {
+			console.log(entity);
 			entity.update(deltaTime);
 		}
 	}
