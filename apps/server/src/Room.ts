@@ -35,7 +35,7 @@ export class MainRoom extends Room<RoomState> {
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, 'left!');
-    // this.state.players.delete(client.sessionId);
+    this.state.players.delete(client.sessionId);
   }
 
   onDispose() {

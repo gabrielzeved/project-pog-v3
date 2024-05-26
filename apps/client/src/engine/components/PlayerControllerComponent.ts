@@ -1,5 +1,5 @@
 import { vec2 } from 'gl-matrix';
-import type { GameEntity } from '../../entities/GameEntity';
+import type { PlayerEntity } from '../../entities/PlayerEntity';
 import { gameApp } from '../../main';
 import type { CharacterAnimationComponent } from './CharacterAnimationComponent';
 import { Component, ComponentNames } from './Component';
@@ -10,8 +10,8 @@ export class PlayerControllerComponent extends Component {
 	public direction: vec2 = [0, 0];
 	private _lastDirection: vec2 = [0, 0];
 
-	constructor(entity: GameEntity, speed: number) {
-		super(entity, ComponentNames.PlayerController);
+	constructor(player: PlayerEntity, speed: number) {
+		super(player, ComponentNames.PlayerController);
 		this.speed = speed;
 	}
 
@@ -36,6 +36,19 @@ export class PlayerControllerComponent extends Component {
 		}
 
 		vec2.normalize(this.direction, direction);
+
+		const newPosition: vec2 = vec2.add(
+			[0, 0],
+			[this.entity.position.x, this.entity.position.y],
+			vec2.scale([0, 0], this.direction, this.speed * dt)
+		);
+
+		this.entity.position.set(newPosition[0], newPosition[1]);
+
+		gameApp.room.send('move', {
+			x: newPosition[0],
+			y: newPosition[1]
+		});
 
 		this.entity
 			.getComponent<CharacterAnimationComponent>(ComponentNames.CharacterAnimation)
