@@ -1,13 +1,13 @@
+import type { Enemy } from '@ppog/shared';
 import { Assets, BitmapText } from 'pixi.js';
 import { AnimatedSpriteComponent } from '../engine/components/AnimatedSpriteComponent';
-import { NetworkEntityComponent } from '../engine/components/NetworkEntityComponent';
 import { TextComponent } from '../engine/components/TextComponent';
 import { GameConfig } from '../utils/Config';
 import { GameEntity } from './GameEntity';
 
 export class EnemyEntity extends GameEntity {
-	constructor(id: string, playerName: string, spritesheetPath: string) {
-		super(playerName);
+	constructor(id: string, entity: Enemy) {
+		super(entity.name, entity);
 
 		this.id = id;
 
@@ -15,12 +15,10 @@ export class EnemyEntity extends GameEntity {
 			this,
 			'IdleSouth',
 			0.3,
-			spritesheetPath,
+			'/assets/enemy/data.json',
 			this.addPlayerNameComponent.bind(this)
 		);
 		this.addComponent(sprite);
-
-		this.addComponent(new NetworkEntityComponent(this));
 	}
 
 	addPlayerNameComponent(sprite: AnimatedSpriteComponent) {

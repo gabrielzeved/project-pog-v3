@@ -1,7 +1,7 @@
 import { gameApp } from '../main';
 import { GameEntity } from './GameEntity';
 
-export default class CameraObject extends GameEntity {
+export default class CameraObject extends GameEntity<undefined> {
 	constructor(
 		name: string,
 		private target: GameEntity,
@@ -20,9 +20,6 @@ export default class CameraObject extends GameEntity {
 
 		const cameraX = this.target.x * this.zoomLevel - screenWidth / 2;
 		const cameraY = this.target.y * this.zoomLevel - screenHeight / 2;
-
-		// console.log(cameraX, 'test');
-		// console.log(cameraY, 'test');
 
 		const maxX = gameApp.app.stage.width - screenWidth; // / 4
 		const maxY = gameApp.app.stage.height - screenHeight; // / 4
