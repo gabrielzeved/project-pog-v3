@@ -16,13 +16,12 @@ export abstract class GameEntity<T extends Entity | undefined = Entity> extends 
 		this._name = name;
 		this.state = state;
 		this.parentLayer = gameApp.layerManager.get('root');
+		this.setupEvent();
 	}
 
 	setupEvent() {
 		this.state.position.onChange(() => {
-			if (gameApp.room.sessionId !== this.id) {
-				this._serverPosition = [this.state.position.x, this.state.position.y];
-			}
+			this._serverPosition = [this.state.position.x, this.state.position.y];
 		});
 	}
 

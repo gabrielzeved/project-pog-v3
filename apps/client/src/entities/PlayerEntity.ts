@@ -29,7 +29,7 @@ export class PlayerEntity extends GameEntity<Player> {
 		this.addComponent(new CharacterAnimationComponent(this));
 
 		if (gameApp.room.sessionId === sessionId) {
-			this.addComponent(new PlayerControllerComponent(this, 100.0));
+			this.addComponent(new PlayerControllerComponent(this, 3.0));
 		}
 	}
 
@@ -54,9 +54,7 @@ export class PlayerEntity extends GameEntity<Player> {
 	update(deltaTime: number): void {
 		super.update(deltaTime);
 
-		if (gameApp.room.sessionId === this.id) return;
-
-		if (!this._serverPosition) return;
+		// if (gameApp.room.sessionId === this.id) return;
 
 		const newPosition: vec2 = [0, 0];
 		vec2.lerp(newPosition, [this.position.x, this.position.y], this._serverPosition, 0.6);

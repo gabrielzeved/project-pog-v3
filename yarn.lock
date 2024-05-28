@@ -121,6 +121,16 @@
   resolved "https://registry.yarnpkg.com/@daybrush/utils/-/utils-1.13.0.tgz#ea70a60864130da476406fdd1d465e3068aea0ff"
   integrity sha512-ALK12C6SQNNHw1enXK+UO8bdyQ+jaWNQ1Af7Z3FNxeAwjYhQT7do+TRE4RASAJ3ObaS2+TJ7TXR3oz2Gzbw0PQ==
 
+"@dimforge/rapier2d-compat@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@dimforge/rapier2d-compat/-/rapier2d-compat-0.13.1.tgz#47fd69baae239d75757823e873165beaaf4865ec"
+  integrity sha512-n8g70IkhhpHHqg+KrRbfCc3rHnRvl2pcWHHwk6tJB/BrwywQhM6zWsBCa2sFVIqCjxv/Ese5qmaxSBICPUo0Sw==
+
+"@dimforge/rapier2d@^0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@dimforge/rapier2d/-/rapier2d-0.13.1.tgz#52c6d4ce4fbee8224ccf64f6c34496c46a45ec00"
+  integrity sha512-pobQfNPBIwL3KfyW07bHqAg4q3CvdJ4sAoZ3PpyZlNp2yuE1IXQohD3VSendtEpATfikVVgazmNEVX2whZNL/g==
+
 "@egjs/agent@^2.2.1":
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/@egjs/agent/-/agent-2.4.3.tgz#6d44e2fb1ff7bab242c07f82732fe60305ac6f06"

@@ -43,11 +43,11 @@ export class PlayerControllerComponent extends Component {
 			vec2.scale([0, 0], this.direction, this.speed * dt)
 		);
 
-		this.entity.position.set(newPosition[0], newPosition[1]);
+		// this.entity.position.set(newPosition[0], newPosition[1]);
 
 		gameApp.room.send('move', {
-			x: newPosition[0],
-			y: newPosition[1]
+			x: this.direction[0] * this.speed,
+			y: this.direction[1] * this.speed
 		});
 
 		this.entity
