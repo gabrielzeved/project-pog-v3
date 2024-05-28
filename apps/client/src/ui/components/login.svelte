@@ -29,9 +29,13 @@
 				console.log('Authentication successful', data);
 
 				localStorage.setItem('pog@auth-token', data.token);
-				gameApp.connect();
 
-				appState.set(AppStates.STATE_PLAYING);
+				if (data.user.characterId) {
+					await gameApp.connect();
+					appState.set(AppStates.STATE_PLAYING);
+				} else {
+					appState.set(AppStates.STATE_CHARACTER_CREATION);
+				}
 			} else {
 				const errorData = await response.json();
 				// Handle error response

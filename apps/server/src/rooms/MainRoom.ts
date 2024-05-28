@@ -71,18 +71,11 @@ export class MainRoom extends Room<RoomState> {
       userId: userData.id
     };
 
-    /* Nenhum personagem criado ainda? */
-    if (!userData.characterId) {
-      await this.characterController.createCharacter(userData.id, {
-        name: 'Renan',
-        x: Math.floor(Math.random() * 500),
-        y: Math.floor(Math.random() * 500)
-      });
-    }
-
     const character = await this.characterController.getUserCharacter(userData.id);
 
     if (character) {
+      console.log(`${client.sessionId} logged in as ${character.name}`);
+      
       const player = new Player();
       player.id = client.sessionId;
       player.username = character.name;
@@ -104,6 +97,8 @@ export class MainRoom extends Room<RoomState> {
       this.state.entities.set(client.sessionId, player);
 
       client.send('WorldLoad', World);
+    } else {
+      // todo: handle no character error
     }
   }
 

@@ -4,6 +4,7 @@ import { gameApp } from '../main';
 export enum AppStates {
 	STATE_LOGIN = 0,
 	STATE_REGISTER,
+	STATE_CHARACTER_CREATION,
 	STATE_PLAYING
 }
 

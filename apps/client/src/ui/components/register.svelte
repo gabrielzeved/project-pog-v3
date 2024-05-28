@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { gameApp } from '../../main';
 	import { AppStates, appState } from '../../routes/store';
 
 	let email: string = '';

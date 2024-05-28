@@ -3,7 +3,7 @@ import { playground } from '@colyseus/playground';
 import config from '@colyseus/tools';
 import { MainRoom } from './rooms';
 import { PrismaClient } from '@prisma/client';
-import { AuthRoutes } from './routes';
+import { AuthRoutes, CharacterRoutes } from './routes';
 import authMiddleware from './middlewares/auth';
 
 export const prismaClient = new PrismaClient();
@@ -31,6 +31,8 @@ export default config({
     app.get('/auth/me', [authMiddleware], (req, res) => {
       res.json(req.user);
     });
+
+    app.post('/character', [authMiddleware], CharacterRoutes.CreateCharacter);
 
     /**
      * Use @colyseus/playground

@@ -4,6 +4,7 @@
 	import '../main';
 	import login from '../ui/components/login.svelte';
 	import register from '../ui/components/register.svelte';
+	import characterCreation from '../ui/components/characterCreation.svelte';
 	import { gameApp } from '../main';
 	import { AppStates, appState } from './store';
 
@@ -61,6 +62,8 @@
 
 			{#if $appState === AppStates.STATE_REGISTER}
 				<svelte:component this={register} />
+			{:else if $appState === AppStates.STATE_CHARACTER_CREATION}
+				<svelte:component this={characterCreation} />
 			{:else}
 				<svelte:component this={login} />
 			{/if}
