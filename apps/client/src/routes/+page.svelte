@@ -3,6 +3,7 @@
 	import '../app.css';
 	import '../main';
 	import login from '../ui/components/login.svelte';
+	import register from '../ui/components/register.svelte';
 	import { gameApp } from '../main';
 	import { AppStates, appState } from './store';
 
@@ -56,7 +57,13 @@
 				<span class="sr-only">Loading...</span>
 			</div>
 		{:else}
-			<svelte:component this={login} />
+			<h1 class="text-xl text-white text-center py-4 uppercase font-extrabold">Project Pog</h1>
+
+			{#if $appState === AppStates.STATE_REGISTER}
+				<svelte:component this={register} />
+			{:else}
+				<svelte:component this={login} />
+			{/if}
 		{/if}
 	</div>
 {/if}

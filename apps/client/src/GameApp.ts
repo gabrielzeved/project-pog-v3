@@ -22,9 +22,12 @@ export class GameApp {
 	public client: Client;
 	public room: Room<RoomState>;
 
-	constructor(options: Partial<PIXI.IApplicationOptions>) {
-		this.app = new PIXI.Application(options);
+	constructor(public options: Partial<PIXI.IApplicationOptions>) {}
+
+	init() {
+		this.app = new PIXI.Application(this.options);
 		this.app.renderer.resize(window.innerWidth, window.innerHeight);
+
 		window.addEventListener('resize', (e) => {
 			this.app.renderer.resize(window.innerWidth, window.innerHeight);
 		});
@@ -46,8 +49,6 @@ export class GameApp {
 
 		this.app.ticker.add(() => this.gameLoop(this.app.ticker.elapsedMS / 1000));
 		this.app.start();
-
-		// this.connect();
 	}
 
 	async connect() {

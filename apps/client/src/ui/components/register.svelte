@@ -5,16 +5,17 @@
 	let email: string = '';
 	let password: string = '';
 	let errorMessage: string = '';
+	let successMessage: string = '';
 
-	function goToRegister() {
-		appState.set(AppStates.STATE_REGISTER);
+	function goToLogin() {
+		appState.set(AppStates.STATE_LOGIN);
 	}
 
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 
 		try {
-			const response = await fetch('http://localhost:3000/auth/login', {
+			const response = await fetch('http://localhost:3000/auth/signup', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -23,15 +24,7 @@
 			});
 
 			if (response.ok) {
-				const data = await response.json();
-
-				// Handle successful authentication
-				console.log('Authentication successful', data);
-
-				localStorage.setItem('pog@auth-token', data.token);
-				gameApp.connect();
-
-				appState.set(AppStates.STATE_PLAYING);
+				successMessage = 'Account successfully created!';
 			} else {
 				const errorData = await response.json();
 				// Handle error response
@@ -48,9 +41,12 @@
 	class="bg-white shadow-md border border-gray-200 rounded-lg max-w-sm p-4 sm:p-6 lg:p-8 dark:bg-gray-800 dark:border-gray-700"
 >
 	<form class="space-y-6" on:submit={handleSubmit}>
-		<h3 class="text-xl text-center font-medium text-gray-900 dark:text-white">Sign in</h3>
+		<h3 class="text-xl text-center font-medium text-gray-900 dark:text-white">Sign up</h3>
 		{#if errorMessage}
 			<div class="text-red-500">{errorMessage}</div>
+		{/if}
+		{#if successMessage}
+			<div class="text-green-500">{successMessage}</div>
 		{/if}
 		<div>
 			<label for="email" class="text-sm font-medium text-gray-900 block mb-2 dark:text-gray-300"
@@ -83,12 +79,12 @@
 		<button
 			type="submit"
 			class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-			>Login</button
+			>Confirm</button
 		>
 		<div class="text-sm font-medium text-gray-500 dark:text-gray-300">
-			Not registered? <button
-				on:click={goToRegister}
-				class="text-blue-700 hover:underline dark:text-blue-500">Create account</button
+			Already registered? <button
+				on:click={goToLogin}
+				class="text-blue-700 hover:underline dark:text-blue-500">Login</button
 			>
 		</div>
 	</form>
