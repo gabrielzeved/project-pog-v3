@@ -47,13 +47,20 @@ export class GameApp {
 		this.app.ticker.add(() => this.gameLoop(this.app.ticker.elapsedMS / 1000));
 		this.app.start();
 
-		this.connect();
+		// this.connect();
 	}
 
 	async connect() {
 		this.client = new Client('ws://localhost:3000');
 
-		this.client.auth.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbHdxbGZjc3MwMDAwaDh5eWdlNDY5ZWd3IiwiaWF0IjoxNzE2OTE2NDA0fQ.XDA4O9zO-4azGW2N0aizFwkQ0OuFt6gQSr4QpxM7otw"
+		const authToken = localStorage.getItem('pog@auth-token');
+
+		if (!authToken) {
+			console.error('Error connecting to game room: Not authenticated.');
+			return;
+		}
+
+		this.client.auth.token = authToken;
 		this.room = await this.client.joinOrCreate('my_room');
 
 		this.room.state.entities.onAdd((entity, sessionId) => {
