@@ -1,15 +1,28 @@
+import type { Entity } from '@ppog/shared';
+import type { vec2 } from 'gl-matrix';
 import { Container } from 'pixi.js';
 import type { Component } from '../engine/components/Component';
 import { gameApp } from '../main';
-export abstract class GameEntity extends Container {
+export abstract class GameEntity<T extends Entity | undefined = Entity> extends Container {
 	private _id!: string;
 	private _name: string;
 	public components: Map<string, Component> = new Map();
+	public state: T;
 
-	constructor(name: string) {
+	protected _serverPosition: vec2;
+
+	constructor(name: string, state: T = undefined) {
 		super();
 		this._name = name;
+		this.state = state;
 		this.parentLayer = gameApp.layerManager.get('root');
+		this.setupEvent();
+	}
+
+	setupEvent() {
+		this.state.position.onChange(() => {
+			this._serverPosition = [this.state.position.x, this.state.position.y];
+		});
 	}
 
 	get id(): string {

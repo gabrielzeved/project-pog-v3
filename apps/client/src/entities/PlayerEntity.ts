@@ -9,15 +9,9 @@ import { TextComponent } from '../engine/components/TextComponent';
 import { gameApp } from '../main';
 import { GameConfig } from '../utils/Config';
 import { GameEntity } from './GameEntity';
-
-export class PlayerEntity extends GameEntity {
-	private _player: Player;
-	public serverPosition: vec2;
-
+export class PlayerEntity extends GameEntity<Player> {
 	constructor(sessionId: string, player: Player) {
-		super(player.username);
-
-		this._player = player;
+		super(player.username, player);
 
 		this.id = sessionId;
 
@@ -34,16 +28,8 @@ export class PlayerEntity extends GameEntity {
 		this.addComponent(new CharacterAnimationComponent(this));
 
 		if (gameApp.room.sessionId === sessionId) {
-			this.addComponent(new PlayerControllerComponent(this, 100.0));
+			this.addComponent(new PlayerControllerComponent(this, 3.0));
 		}
-	}
-
-	setupEvent() {
-		this._player.position.onChange(() => {
-			if (gameApp.room.sessionId !== this.id) {
-				this.serverPosition = [this._player.position.x, this._player.position.y];
-			}
-		});
 	}
 
 	addPlayerNameComponent(sprite: AnimatedSpriteComponent) {
@@ -67,10 +53,10 @@ export class PlayerEntity extends GameEntity {
 	update(deltaTime: number): void {
 		super.update(deltaTime);
 
-		if (gameApp.room.sessionId === this.id) return;
+		// if (gameApp.room.sessionId === this.id) return;
 
 		const newPosition: vec2 = [0, 0];
-		vec2.lerp(newPosition, [this.position.x, this.position.y], this.serverPosition, 0.6);
+		vec2.lerp(newPosition, [this.position.x, this.position.y], this._serverPosition, 0.6);
 
 		let direction = vec2.sub(
 			[0, 0],

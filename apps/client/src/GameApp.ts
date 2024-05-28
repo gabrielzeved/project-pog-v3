@@ -1,11 +1,12 @@
 import { Stage } from '@pixi/layers';
 import type { Tilemap } from '@pixi/tilemap';
-import type { RoomState, WorldData } from '@ppog/shared';
+import { Enemy, EntityType, Player, type RoomState, type WorldData } from '@ppog/shared';
 import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
 import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
-import { LayerManager } from './engine/LayerManager';
+import { LayerManager } from './engine/managers/LayerManager';
+import { EnemyEntity } from './entities/EnemyEntity';
 import type { GameEntity } from './entities/GameEntity';
 import { PlayerEntity } from './entities/PlayerEntity';
 import './utils/math';
@@ -51,20 +52,27 @@ export class GameApp {
 
 	async connect() {
 		this.client = new Client('ws://localhost:3000');
+
+		this.client.auth.token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbHdxbGZjc3MwMDAwaDh5eWdlNDY5ZWd3IiwiaWF0IjoxNzE2OTE2NDA0fQ.XDA4O9zO-4azGW2N0aizFwkQ0OuFt6gQSr4QpxM7otw"
 		this.room = await this.client.joinOrCreate('my_room');
 
-		this.room.state.players.onAdd((player, sessionId) => {
-			const entity = new PlayerEntity(sessionId, player);
-			entity.parentLayer = this.layerManager.get('root');
-			entity.zOrder = 2;
+		this.room.state.entities.onAdd((entity, sessionId) => {
+			let gameEntity: GameEntity;
 
-			entity.position.set(player.position.x, player.position.y);
-			this.addEntity(entity);
-			entity.setupEvent();
+			if (entity.type == EntityType.ENEMY) {
+				gameEntity = new EnemyEntity(entity.id, entity as Enemy);
+			} else if (entity.type == EntityType.PLAYER) {
+				gameEntity = new PlayerEntity(sessionId, entity as Player);
+			}
+
+			gameEntity.position.set(entity.position.x, entity.position.y);
+			gameEntity.zOrder = 99;
+
+			this.addEntity(gameEntity);
 		});
 
-		this.room.state.players.onRemove((player, sessionId) => {
-			this.destroyEntity(sessionId);
+		this.room.state.entities.onRemove((_, id) => {
+			this.destroyEntity(id);
 		});
 
 		this.room.onMessage('WorldLoad', async (data) => {
