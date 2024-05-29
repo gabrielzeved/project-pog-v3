@@ -3,7 +3,6 @@ import type { Tilemap } from '@pixi/tilemap';
 import { Enemy, EntityType, Player, type RoomState, type WorldData } from '@ppog/shared';
 import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
-import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
 import { LayerManager } from './engine/managers/LayerManager';
 import { EnemyEntity } from './entities/EnemyEntity';
@@ -17,21 +16,32 @@ export class GameApp {
 	private entities: GameEntity[] = [];
 	public keyboardManager: InputKeyboardManager;
 	public layerManager: LayerManager = new LayerManager();
-	public connectedClients = writable<string[]>([]);
-	worldMap: WorldData;
+	public worldMap: WorldData;
 	public client: Client;
 	public room: Room<RoomState>;
 
 	constructor(public options: Partial<PIXI.IApplicationOptions>) {}
 
 	init() {
+		this.setupApplication();
+		this.setupResizeHandler();
+		this.setupKeyboardManager();
+		this.setupLayerManager();
+		this.startGameLoop();
+	}
+
+	private setupApplication(): void {
 		this.app = new PIXI.Application(this.options);
 		this.app.renderer.resize(window.innerWidth, window.innerHeight);
+	}
 
-		window.addEventListener('resize', (e) => {
+	private setupResizeHandler(): void {
+		window.addEventListener('resize', () => {
 			this.app.renderer.resize(window.innerWidth, window.innerHeight);
 		});
+	}
 
+	private setupKeyboardManager(): void {
 		this.keyboardManager = new InputKeyboardManager(
 			{
 				UP: 'w',
@@ -42,53 +52,71 @@ export class GameApp {
 			},
 			this.app
 		);
+	}
 
+	private setupLayerManager(): void {
 		this.layerManager.add('root', 0);
 		this.app.stage = new Stage();
 		this.app.stage.addChild(this.layerManager.get('root'));
+	}
 
-		this.app.ticker.add(() => this.gameLoop(this.app.ticker.elapsedMS / 1000));
+	private startGameLoop(): void {
+		this.app.ticker.add((delta) => this.gameLoop(delta / 1000));
 		this.app.start();
 	}
 
-	async connect() {
+	public async connect(): Promise<void> {
+		try {
+			await this.initializeClient();
+			await this.joinRoom();
+			this.setupRoomHandlers();
+		} catch (error) {
+			console.error('Error connecting to game room:', error);
+		}
+	}
+
+	private async initializeClient(): Promise<void> {
 		this.client = new Client('ws://localhost:3000');
-
 		const authToken = localStorage.getItem('pog@auth-token');
-
 		if (!authToken) {
-			console.error('Error connecting to game room: Not authenticated.');
-			return;
+			throw new Error('Not authenticated.');
+		}
+		this.client.auth.token = authToken;
+	}
+
+	private async joinRoom(): Promise<void> {
+		this.room = await this.client.joinOrCreate('my_room');
+	}
+
+	private setupRoomHandlers(): void {
+		this.room.state.entities.onAdd((entity, sessionId) => this.handleEntityAdd(entity, sessionId));
+		this.room.state.entities.onRemove((_, id) => this.handleEntityRemove(id));
+		this.room.onMessage('WorldLoad', (data) => this.handleWorldLoad(data));
+	}
+
+	private handleEntityAdd(entity: any, sessionId: string): void {
+		let gameEntity: GameEntity;
+
+		if (entity.type === EntityType.ENEMY) {
+			gameEntity = new EnemyEntity(entity.id, entity as Enemy);
+		} else if (entity.type === EntityType.PLAYER) {
+			gameEntity = new PlayerEntity(sessionId, entity as Player);
 		}
 
-		this.client.auth.token = authToken;
-		this.room = await this.client.joinOrCreate('my_room');
+		gameEntity.position.set(entity.position.x, entity.position.y);
+		gameEntity.zOrder = 99; // Temporary
 
-		this.room.state.entities.onAdd((entity, sessionId) => {
-			let gameEntity: GameEntity;
+		this.addEntity(gameEntity);
+	}
 
-			if (entity.type == EntityType.ENEMY) {
-				gameEntity = new EnemyEntity(entity.id, entity as Enemy);
-			} else if (entity.type == EntityType.PLAYER) {
-				gameEntity = new PlayerEntity(sessionId, entity as Player);
-			}
+	private handleEntityRemove(id: string): void {
+		this.destroyEntity(id);
+	}
 
-			gameEntity.position.set(entity.position.x, entity.position.y);
-			gameEntity.zOrder = 99;
-
-			this.addEntity(gameEntity);
-		});
-
-		this.room.state.entities.onRemove((_, id) => {
-			this.destroyEntity(id);
-		});
-
-		this.room.onMessage('WorldLoad', async (data) => {
-			this.worldMap = data;
-
-			await initTextures(this.worldMap);
-			await drawLayers(this.worldMap.layers);
-		});
+	private async handleWorldLoad(data: WorldData): Promise<void> {
+		this.worldMap = data;
+		await initTextures(this.worldMap);
+		await drawLayers(this.worldMap.layers);
 	}
 
 	getEntity(id: string) {
