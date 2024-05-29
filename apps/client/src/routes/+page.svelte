@@ -7,6 +7,7 @@
 	import characterCreation from '../ui/components/characterCreation.svelte';
 	import { gameApp } from '../main';
 	import { AppStates, appState } from './store';
+	import chatbox from '../ui/components/chatbox.svelte';
 
 	let loading = true;
 
@@ -69,6 +70,10 @@
 			{/if}
 		{/if}
 	</div>
+{/if}
+
+{#if $appState === AppStates.STATE_PLAYING}
+	<svelte:component this={chatbox} />
 {/if}
 
 <!-- <div>

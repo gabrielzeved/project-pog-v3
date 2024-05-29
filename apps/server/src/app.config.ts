@@ -1,7 +1,7 @@
 import { monitor } from '@colyseus/monitor';
 import { playground } from '@colyseus/playground';
 import config from '@colyseus/tools';
-import { MainRoom } from './rooms';
+import { ChatRoom, MainRoom } from './rooms';
 import { PrismaClient } from '@prisma/client';
 import { AuthRoutes, CharacterRoutes } from './routes';
 import authMiddleware from './middlewares/auth';
@@ -14,6 +14,7 @@ export default config({
      * Define your room handlers:
      */
     gameServer.define('my_room', MainRoom);
+    gameServer.define('chat_room', ChatRoom);
   },
 
   initializeExpress: (app) => {

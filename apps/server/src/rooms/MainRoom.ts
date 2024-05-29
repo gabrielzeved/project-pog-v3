@@ -1,5 +1,5 @@
 import RAPIER, { RigidBodyDesc } from '@dimforge/rapier2d-compat';
-import { Enemy, Player, RoomState } from '@ppog/shared';
+import { Enemy, Player, MainRoomState } from '@ppog/shared';
 import { Client, Room, ServerError } from 'colyseus';
 import { v4 } from 'uuid';
 import { WorldPhysics } from '../WorldPhysics';
@@ -10,7 +10,7 @@ import { User } from '@prisma/client';
 import * as jwt from 'jsonwebtoken';
 import CharacterController from '../controllers/character';
 
-export class MainRoom extends Room<RoomState> {
+export class MainRoom extends Room<MainRoomState> {
   maxClients: number = 50;
   physics: WorldPhysics;
   characterController = new CharacterController();
@@ -38,7 +38,7 @@ export class MainRoom extends Room<RoomState> {
   }
 
   onCreate(options: any) {
-    this.setState(new RoomState());
+    this.setState(new MainRoomState());
     const enemy = new Enemy();
     enemy.name = 'Enemy';
     enemy.id = v4();
@@ -75,7 +75,7 @@ export class MainRoom extends Room<RoomState> {
 
     if (character) {
       console.log(`${client.sessionId} logged in as ${character.name}`);
-      
+
       const player = new Player();
       player.id = client.sessionId;
       player.username = character.name;

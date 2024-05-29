@@ -1,6 +1,6 @@
 import { Stage } from '@pixi/layers';
 import type { Tilemap } from '@pixi/tilemap';
-import { Enemy, EntityType, Player, type RoomState, type WorldData } from '@ppog/shared';
+import { Enemy, EntityType, Player, type MainRoomState, type WorldData } from '@ppog/shared';
 import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
 import InputKeyboardManager from './engine/InputKeyboardManager';
@@ -10,15 +10,17 @@ import type { GameEntity } from './entities/GameEntity';
 import { PlayerEntity } from './entities/PlayerEntity';
 import './utils/math';
 import { drawLayers, initTextures } from './engine/tilemap/Tilemap';
+import { ChatManager } from './engine/managers/ChatManager';
 
 export class GameApp {
 	public app: PIXI.Application;
 	private entities: GameEntity[] = [];
 	public keyboardManager: InputKeyboardManager;
-	public layerManager: LayerManager = new LayerManager();
+	public layerManager: LayerManager;
+	public chatManager: ChatManager;
 	public worldMap: WorldData;
 	public client: Client;
-	public room: Room<RoomState>;
+	public room: Room<MainRoomState>;
 
 	constructor(public options: Partial<PIXI.IApplicationOptions>) {}
 
@@ -55,6 +57,7 @@ export class GameApp {
 	}
 
 	private setupLayerManager(): void {
+		this.layerManager = new LayerManager();
 		this.layerManager.add('root', 0);
 		this.app.stage = new Stage();
 		this.app.stage.addChild(this.layerManager.get('root'));
@@ -117,6 +120,12 @@ export class GameApp {
 		this.worldMap = data;
 		await initTextures(this.worldMap);
 		await drawLayers(this.worldMap.layers);
+
+		this.setupChatManager();
+	}
+
+	private setupChatManager() {
+		this.chatManager = new ChatManager(this.client);
 	}
 
 	getEntity(id: string) {
