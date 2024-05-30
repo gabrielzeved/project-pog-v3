@@ -1,6 +1,6 @@
 {
   "extends": "@ppog/config/base.json",
-  "include": ["."],
+  "include": [".", "../../packages/shared/actions/ActionType.ts"],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "resolveJsonModule": true,

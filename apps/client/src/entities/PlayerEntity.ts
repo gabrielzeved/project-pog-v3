@@ -1,4 +1,5 @@
 import type { Player } from '@ppog/shared';
+import { ActionType } from '@ppog/shared/actions/ActionType';
 import { vec2 } from 'gl-matrix';
 import { Assets, BitmapText } from 'pixi.js';
 import { AnimatedSpriteComponent } from '../engine/components/AnimatedSpriteComponent';
@@ -35,6 +36,12 @@ export class PlayerEntity extends GameEntity<Player> {
 
 	setupEvent(): void {
 		super.setupEvent();
+
+		this.state.listen('currentAction', (currentAction) => {
+			if (currentAction === ActionType.SLASH) {
+				this.getComponent<CharacterAnimationComponent>(ComponentNames.CharacterAnimation).attack();
+			}
+		});
 	}
 
 	spriteCallback(sprite: AnimatedSpriteComponent) {
@@ -49,11 +56,11 @@ export class PlayerEntity extends GameEntity<Player> {
 			const spriteWidth = sprite.sprite?.texture.orig.width ?? 64;
 
 			const textX = spriteWidth / 2 - text.width / 2;
-			const textY = -8;
+			const textY = -12;
 			this.addComponent(new TextComponent(this, text, textX, textY));
 
 			const healthX = spriteWidth / 2 - 32;
-			const healthY = -28;
+			const healthY = -4;
 			this.addComponent(new HealthbarComponent(this, healthX, healthY, 64, 16, 'sharp'));
 		});
 	}

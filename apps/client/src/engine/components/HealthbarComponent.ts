@@ -40,28 +40,31 @@ export class HealthbarComponent extends Component {
 
 		const data = HealthBarData[variant];
 
-		const texture = PIXI.Texture.from('/assets/ui/texture.png', {});
-		texture.on('update', () => {
-			texture.frame = new PIXI.Rectangle(
-				data.rect.x,
-				data.rect.y,
-				data.rect.width,
-				data.rect.height
+		const asset = PIXI.Assets.load('/assets/ui/texture.png');
+
+		asset.then((baseTexture) => {
+			const texture = new PIXI.Texture(
+				baseTexture,
+				new PIXI.Rectangle(data.rect.x, data.rect.y, data.rect.width, data.rect.height)
 			);
-			texture.updateUvs();
+
+			this.frame = new PIXI.NineSlicePlane(
+				texture,
+				data.slice.leftWidth,
+				data.slice.topHeight,
+				data.slice.rightWidth,
+				data.slice.bottomHeight
+			);
+
 			this.setSize(width, height);
+
+			this.graphics.addChild(this.frame);
+			this.draw();
 		});
-		this.frame = new PIXI.NineSlicePlane(
-			texture,
-			data.slice.leftWidth,
-			data.slice.topHeight,
-			data.slice.rightWidth,
-			data.slice.bottomHeight
-		);
+
 		this.setPosition(localX, localY);
-		this.draw();
-		this.graphics.addChild(this.frame);
 		this.entity.addChild(this.graphics);
+		this.setupEvent();
 	}
 
 	setupEvent() {
@@ -76,6 +79,8 @@ export class HealthbarComponent extends Component {
 	}
 
 	draw() {
+		if (!this.frame) return;
+
 		const percentage = this.entity.state.health / this.entity.state.maxHealth;
 
 		const data = HealthBarData[this.variant];

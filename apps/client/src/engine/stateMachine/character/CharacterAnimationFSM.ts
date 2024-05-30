@@ -66,9 +66,6 @@ class IdleState extends AnimationState {
 	get name() {
 		return 'idle';
 	}
-	update(delta: number): void {
-		super.update(delta);
-	}
 }
 
 class WalkState extends AnimationState {
@@ -77,10 +74,6 @@ class WalkState extends AnimationState {
 
 	get name() {
 		return 'walk';
-	}
-
-	update(delta: number): void {
-		super.update(delta);
 	}
 }
 

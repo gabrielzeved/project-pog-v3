@@ -1,6 +1,6 @@
+import { ActionType } from '@ppog/shared/actions/ActionType';
 import actions from '../assets/actions.json';
 import { Process } from '../process/Process';
-import { ActionType } from './ActionType';
 
 export interface ActionData {
   id: string;
@@ -8,7 +8,11 @@ export interface ActionData {
 }
 
 export class ActionManager {
-  public actions: Map<string, Process> = new Map();
+  private actions: Map<string, Process> = new Map();
+
+  addAction(id: string, process: Process) {
+    this.actions.set(id, process);
+  }
 
   getData(action: ActionType): ActionData {
     return actions[action];

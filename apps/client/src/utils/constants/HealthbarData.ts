@@ -46,8 +46,8 @@ export const HealthBarData: Record<HealthbarVariant, HealthbarMetadata> = {
 	},
 	rounded: {
 		offset: {
-			x: 11,
-			y: 7,
+			x: 10,
+			y: 6,
 			height: 13,
 			width: 18
 		},

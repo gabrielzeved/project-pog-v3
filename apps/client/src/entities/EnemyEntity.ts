@@ -1,11 +1,12 @@
 import type { Enemy } from '@ppog/shared';
 import { Assets, BitmapText } from 'pixi.js';
 import { AnimatedSpriteComponent } from '../engine/components/AnimatedSpriteComponent';
+import { HealthbarComponent } from '../engine/components/HealthbarComponent';
 import { TextComponent } from '../engine/components/TextComponent';
 import { GameConfig } from '../utils/Config';
 import { GameEntity } from './GameEntity';
 
-export class EnemyEntity extends GameEntity {
+export class EnemyEntity extends GameEntity<Enemy> {
 	constructor(id: string, entity: Enemy) {
 		super(entity.name, entity);
 
@@ -33,9 +34,13 @@ export class EnemyEntity extends GameEntity {
 			const spriteWidth = sprite.sprite?.texture.orig.width ?? 64;
 
 			const textX = spriteWidth / 2 - text.width / 2;
-			const textY = -8;
+			const textY = -12;
 
 			this.addComponent(new TextComponent(this, text, textX, textY));
+
+			const healthX = spriteWidth / 2 - 32;
+			const healthY = -4;
+			this.addComponent(new HealthbarComponent(this, healthX, healthY, 64, 16, 'rounded'));
 		});
 	}
 }

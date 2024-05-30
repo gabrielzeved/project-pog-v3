@@ -1,4 +1,6 @@
 import { Enemy, EntityType, MainRoomState, Player } from '@ppog/shared';
+import { ActionType } from '@ppog/shared/actions/ActionType';
+import { DamagableEntity } from '@ppog/shared/entities/DamagableEntity';
 import { User } from '@prisma/client';
 import { Client, Room, ServerError } from 'colyseus';
 import { IncomingMessage } from 'http';
@@ -8,6 +10,7 @@ import { GameManager } from '../GameManager';
 import { prismaClient } from '../app.config';
 import World from '../assets/worlds/map.json';
 import CharacterController from '../controllers/character';
+import { CooldownProcess } from '../process/CooldownProcess';
 
 export class MainRoom extends Room<MainRoomState> {
   maxClients: number = 50;
@@ -63,6 +66,8 @@ export class MainRoom extends Room<MainRoomState> {
       }
     });
 
+    enemy.name = 'Enemy';
+
     this.setPatchRate(1000 / 60);
 
     this.onMessage('move', (client, message) => {
@@ -75,15 +80,39 @@ export class MainRoom extends Room<MainRoomState> {
     });
 
     this.onMessage('attack', (client, message) => {
+      const entity = this.state.entities.get(client.sessionId);
       const body = GameManager.getInstance().physics.bodies.get(client.sessionId);
 
-      if (!body) return;
+      if (!entity) return;
+      if (!(entity instanceof Player)) return;
+      if (entity.currentAction === ActionType.SLASH) return;
+
+      entity.currentAction = ActionType.SLASH;
+
+      GameManager.getInstance().actionManager.addAction(
+        v4(),
+        new CooldownProcess(350, () => {
+          entity.currentAction = ActionType.NONE;
+        })
+      );
 
       const entities = GameManager.getInstance().physics.boxCast(
-        body.translation(),
-        { x: 32.0, y: 32.0 },
+        {
+          x: entity.position.x + 16,
+          y: entity.position.y
+        },
+        {
+          x: 16,
+          y: 16
+        },
         body
       );
+
+      for (const target of entities) {
+        if (!(target instanceof DamagableEntity)) return;
+
+        target.health = target.health - 1;
+      }
     });
   }
 

@@ -1,9 +1,11 @@
 import { type } from '@colyseus/schema';
+import { ActionType } from '../actions/ActionType';
 import { DamagableEntity } from './DamagableEntity';
 import { EntityType } from './EntityType';
 
 export class Player extends DamagableEntity {
   @type('string') username: string;
+  @type('int8') currentAction: ActionType = ActionType.NONE;
 
   constructor(...args: any[]) {
     super(args);
