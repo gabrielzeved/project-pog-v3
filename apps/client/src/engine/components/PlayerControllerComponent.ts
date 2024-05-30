@@ -15,7 +15,30 @@ export class PlayerControllerComponent extends Component {
 		this.speed = speed;
 	}
 
+	updateCamera() {
+		const zoomLevel = 2;
+		const ease = 1;
+		const screenWidth = window.innerWidth;
+		const screenHeight = window.innerHeight;
+
+		const cameraX = this.entity.position.x * zoomLevel - screenWidth / 2;
+		const cameraY = this.entity.position.y * zoomLevel - screenHeight / 2;
+
+		const maxX = gameApp.app.stage.width - screenWidth; // / 4
+		const maxY = gameApp.app.stage.height - screenHeight; // / 4
+
+		let futureX = Math.max(0, Math.min(cameraX, maxX));
+		gameApp.app.stage.x = -Math.mix(gameApp.app.stage.x, futureX, ease);
+
+		let futureY = Math.max(0, Math.min(cameraY, maxY));
+		gameApp.app.stage.y = -Math.mix(gameApp.app.stage.y, futureY, ease);
+
+		gameApp.app.stage.scale.set(zoomLevel);
+	}
+
 	update(dt: number) {
+		this.updateCamera();
+
 		const input = gameApp.keyboardManager;
 
 		vec2.copy(this._lastDirection, this.direction);

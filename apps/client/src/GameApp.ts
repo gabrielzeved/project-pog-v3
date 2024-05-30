@@ -5,11 +5,12 @@ import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
 import { writable } from 'svelte/store';
 import InputKeyboardManager from './engine/InputKeyboardManager';
-import { LayerManager } from './engine/LayerManager';
+import { LayerManager } from './engine/managers/LayerManager';
 import { EnemyEntity } from './entities/EnemyEntity';
 import type { GameEntity } from './entities/GameEntity';
 import { PlayerEntity } from './entities/PlayerEntity';
 import './utils/math';
+import { drawLayers, initTextures } from './engine/tilemap/Tilemap';
 
 export class GameApp {
 	public app: PIXI.Application;
@@ -21,9 +22,12 @@ export class GameApp {
 	public client: Client;
 	public room: Room<RoomState>;
 
-	constructor(options: Partial<PIXI.IApplicationOptions>) {
-		this.app = new PIXI.Application(options);
+	constructor(public options: Partial<PIXI.IApplicationOptions>) {}
+
+	init() {
+		this.app = new PIXI.Application(this.options);
 		this.app.renderer.resize(window.innerWidth, window.innerHeight);
+
 		window.addEventListener('resize', (e) => {
 			this.app.renderer.resize(window.innerWidth, window.innerHeight);
 		});
@@ -45,12 +49,19 @@ export class GameApp {
 
 		this.app.ticker.add(() => this.gameLoop(this.app.ticker.elapsedMS / 1000));
 		this.app.start();
-
-		this.connect();
 	}
 
 	async connect() {
 		this.client = new Client('ws://localhost:3000');
+
+		const authToken = localStorage.getItem('pog@auth-token');
+
+		if (!authToken) {
+			console.error('Error connecting to game room: Not authenticated.');
+			return;
+		}
+
+		this.client.auth.token = authToken;
 		this.room = await this.client.joinOrCreate('my_room');
 
 		this.room.state.entities.onAdd((entity, sessionId) => {
@@ -63,12 +74,20 @@ export class GameApp {
 			}
 
 			gameEntity.position.set(entity.position.x, entity.position.y);
+			gameEntity.zOrder = 99;
 
 			this.addEntity(gameEntity);
 		});
 
 		this.room.state.entities.onRemove((_, id) => {
 			this.destroyEntity(id);
+		});
+
+		this.room.onMessage('WorldLoad', async (data) => {
+			this.worldMap = data;
+
+			await initTextures(this.worldMap);
+			await drawLayers(this.worldMap.layers);
 		});
 	}
 

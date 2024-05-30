@@ -10,7 +10,6 @@ import { TextComponent } from '../engine/components/TextComponent';
 import { gameApp } from '../main';
 import { GameConfig } from '../utils/Config';
 import { GameEntity } from './GameEntity';
-
 export class PlayerEntity extends GameEntity<Player> {
 	constructor(sessionId: string, player: Player) {
 		super(player.username, player);

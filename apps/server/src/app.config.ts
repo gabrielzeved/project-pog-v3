@@ -1,7 +1,12 @@
 import { monitor } from '@colyseus/monitor';
 import { playground } from '@colyseus/playground';
 import config from '@colyseus/tools';
-import { MainRoom } from './Room';
+import { MainRoom } from './rooms';
+import { PrismaClient } from '@prisma/client';
+import { AuthRoutes, CharacterRoutes } from './routes';
+import authMiddleware from './middlewares/auth';
+
+export const prismaClient = new PrismaClient();
 
 export default config({
   initializeGameServer: (gameServer) => {
@@ -19,6 +24,15 @@ export default config({
     // app.get("/hello_world", (req, res) => {
     //     res.send("It's time to kick ass and chew bubblegum!");
     // });
+
+    app.post('/auth/signup', AuthRoutes.SignUp);
+    app.post('/auth/login', AuthRoutes.Login);
+
+    app.get('/auth/me', [authMiddleware], (req, res) => {
+      res.json(req.user);
+    });
+
+    app.post('/character', [authMiddleware], CharacterRoutes.CreateCharacter);
 
     /**
      * Use @colyseus/playground
