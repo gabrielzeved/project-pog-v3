@@ -1,6 +1,6 @@
-import { MainRoom } from './Room';
 import { WorldPhysics } from './WorldPhysics';
 import { EntityManager } from './entities/EntityManager';
+import { MainRoom } from './rooms';
 
 export class GameManager {
   private static instance: GameManager;

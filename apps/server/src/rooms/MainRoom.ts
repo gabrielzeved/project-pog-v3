@@ -1,18 +1,16 @@
-import RAPIER, { RigidBodyDesc } from '@dimforge/rapier2d-compat';
-import { Enemy, Player, RoomState } from '@ppog/shared';
-import { Client, Room, ServerError } from 'colyseus';
-import { v4 } from 'uuid';
-import { WorldPhysics } from '../WorldPhysics';
-import World from '../assets/worlds/map.json';
-import { IncomingMessage } from 'http';
-import { prismaClient } from '../app.config';
+import { Enemy, EntityType, MainRoomState, Player } from '@ppog/shared';
 import { User } from '@prisma/client';
+import { Client, Room, ServerError } from 'colyseus';
+import { IncomingMessage } from 'http';
 import * as jwt from 'jsonwebtoken';
+import { v4 } from 'uuid';
+import { GameManager } from '../GameManager';
+import { prismaClient } from '../app.config';
+import World from '../assets/worlds/map.json';
 import CharacterController from '../controllers/character';
 
-export class MainRoom extends Room<RoomState> {
+export class MainRoom extends Room<MainRoomState> {
   maxClients: number = 50;
-  physics: WorldPhysics;
   characterController = new CharacterController();
 
   /* Executes before onJoin */
@@ -37,17 +35,29 @@ export class MainRoom extends Room<RoomState> {
     return user;
   }
 
-  onCreate(options: any) {
-    this.setState(new RoomState());
-    const enemy = new Enemy();
-    enemy.name = 'Enemy';
-    enemy.id = v4();
-    enemy.position.x = Math.floor(Math.random() * 100);
-    enemy.position.y = Math.floor(Math.random() * 100);
-    enemy.velocity.x = 0;
-    enemy.velocity.y = 0;
+  async onCreate(options: any) {
+    this.setState(new MainRoomState());
 
-    this.state.entities.set(enemy.id, enemy);
+    await GameManager.getInstance().start(this);
+
+    const enemy = GameManager.getInstance().entityManager.spawn<Enemy>(EntityType.ENEMY, {
+      id: v4(),
+      type: EntityType.ENEMY,
+      position: {
+        x: Math.floor(Math.random() * 100),
+        y: Math.floor(Math.random() * 100)
+      },
+      velocity: {
+        x: 0,
+        y: 0
+      },
+      collisionBox: {
+        h: 32,
+        w: 32,
+        x: 0,
+        y: 0
+      }
+    });
 
     this.setPatchRate(1000 / 60);
 
@@ -60,8 +70,17 @@ export class MainRoom extends Room<RoomState> {
       entity.velocity.y = message.y;
     });
 
-    this.physics = new WorldPhysics(this);
-    this.physics.runSimulation();
+    this.onMessage('attack', (client, message) => {
+      const body = GameManager.getInstance().physics.bodies.get(client.sessionId);
+
+      if (!body) return;
+
+      const entities = GameManager.getInstance().physics.boxCast(
+        body.translation(),
+        { x: 32.0, y: 32.0 },
+        body
+      );
+    });
   }
 
   async onJoin(client: Client, options: any, userData: User) {
@@ -75,26 +94,27 @@ export class MainRoom extends Room<RoomState> {
 
     if (character) {
       console.log(`${client.sessionId} logged in as ${character.name}`);
-      
-      const player = new Player();
-      player.id = client.sessionId;
+
+      const player = GameManager.getInstance().entityManager.spawn<Player>(EntityType.PLAYER, {
+        id: client.sessionId,
+        type: EntityType.PLAYER,
+        position: {
+          x: character.x,
+          y: character.y
+        },
+        velocity: {
+          x: 0,
+          y: 0
+        },
+        collisionBox: {
+          h: 32,
+          w: 32,
+          x: 0,
+          y: 0
+        }
+      });
+
       player.username = character.name;
-      player.position.x = character.x;
-      player.position.y = character.y;
-      player.velocity.x = 0;
-      player.velocity.y = 0;
-
-      const rigidBody = this.physics.world.createRigidBody(RigidBodyDesc.kinematicVelocityBased());
-      rigidBody.setTranslation({ x: player.position.x, y: player.position.y }, true);
-      rigidBody.userData = client.sessionId;
-      this.physics.world.createCollider(
-        RAPIER.ColliderDesc.cuboid(player.collisionBox.width / 2, player.collisionBox.height / 2),
-        rigidBody
-      );
-
-      this.physics.bodies.set(player.id, rigidBody);
-
-      this.state.entities.set(client.sessionId, player);
 
       client.send('WorldLoad', World);
     } else {
@@ -116,10 +136,12 @@ export class MainRoom extends Room<RoomState> {
       });
     }
 
-    this.state.entities.delete(client.sessionId);
+    const physics = GameManager.getInstance().physics;
 
-    this.physics.world.removeRigidBody(this.physics.bodies.get(client.sessionId));
-    this.physics.bodies.delete(client.sessionId);
+    GameManager.getInstance().physics.world.removeRigidBody(physics.bodies.get(client.sessionId));
+    physics.bodies.delete(client.sessionId);
+
+    this.state.entities.delete(client.sessionId);
   }
 
   onDispose() {

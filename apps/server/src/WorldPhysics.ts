@@ -1,7 +1,7 @@
 import RAPIER, { KinematicCharacterController, RigidBody, Vector } from '@dimforge/rapier2d-compat';
 import { Entity } from '@ppog/shared';
 import { GameManager } from './GameManager';
-import { MainRoom } from './Room';
+import { MainRoom } from './rooms';
 
 export class WorldPhysics {
   public bodies: Map<string, RigidBody> = new Map();
