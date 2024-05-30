@@ -1,8 +1,8 @@
+import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
+import { Tilemap } from '@pixi/tilemap';
 import type { Layer, WorldData } from '@ppog/shared';
 import * as PIXI from 'pixi.js';
-import { Tilemap } from '@pixi/tilemap';
 import { gameApp } from '../../main';
-import { CELL_SIZE, MAP_SIZE } from '$lib/constants';
 
 export const textures: PIXI.Texture[] = [];
 export let textureRows: number;
@@ -66,15 +66,6 @@ export async function drawLayers(layersList: Layer[] = []) {
 				const tile = layer.data[y * MAP_SIZE + x];
 
 				if (tile != null) {
-					// if (tile instanceof AutoTile) {
-					// 	tilemap.tile(
-					// 		textures[`${tile.determineTile(x, y, layer.map)}`],
-					// 		x * CELL_SIZE,
-					// 		y * CELL_SIZE
-					// 	);
-					// 	continue;
-					// }
-
 					tilemap.tile(textures[`${tile}`], x * CELL_SIZE, y * CELL_SIZE);
 				}
 			}

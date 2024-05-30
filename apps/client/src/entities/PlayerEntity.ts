@@ -4,6 +4,7 @@ import { Assets, BitmapText } from 'pixi.js';
 import { AnimatedSpriteComponent } from '../engine/components/AnimatedSpriteComponent';
 import { CharacterAnimationComponent } from '../engine/components/CharacterAnimationComponent';
 import { ComponentNames } from '../engine/components/Component';
+import { HealthbarComponent } from '../engine/components/HealthbarComponent';
 import { PlayerControllerComponent } from '../engine/components/PlayerControllerComponent';
 import { TextComponent } from '../engine/components/TextComponent';
 import { gameApp } from '../main';
@@ -22,7 +23,7 @@ export class PlayerEntity extends GameEntity<Player> {
 			'IdleSouth',
 			0.3,
 			'/assets/player/data.json',
-			this.addPlayerNameComponent.bind(this)
+			this.spriteCallback.bind(this)
 		);
 		this.addComponent(sprite);
 
@@ -33,7 +34,11 @@ export class PlayerEntity extends GameEntity<Player> {
 		}
 	}
 
-	addPlayerNameComponent(sprite: AnimatedSpriteComponent) {
+	setupEvent(): void {
+		super.setupEvent();
+	}
+
+	spriteCallback(sprite: AnimatedSpriteComponent) {
 		Assets.load(GameConfig.fonts.default.path).then(() => {
 			const text = new BitmapText(this.name.toLocaleLowerCase(), {
 				fontName: GameConfig.fonts.default.name,
@@ -46,8 +51,11 @@ export class PlayerEntity extends GameEntity<Player> {
 
 			const textX = spriteWidth / 2 - text.width / 2;
 			const textY = -8;
-
 			this.addComponent(new TextComponent(this, text, textX, textY));
+
+			const healthX = spriteWidth / 2 - 50;
+			const healthY = -28;
+			this.addComponent(new HealthbarComponent(this, healthX, healthY, 100, 16, 'sharp'));
 		});
 	}
 

@@ -35,6 +35,10 @@ export class PlayerControllerComponent extends Component {
 			vec2.add(direction, direction, [-1, 0]);
 		}
 
+		if (input.iskeyDownOnce('SPACE')) {
+			gameApp.room.send('attack', 0);
+		}
+
 		vec2.normalize(this.direction, direction);
 
 		const newPosition: vec2 = vec2.add(
