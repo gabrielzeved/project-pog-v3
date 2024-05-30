@@ -4,7 +4,6 @@ import { MainRoom } from './rooms';
 
 export class GameManager {
   private static instance: GameManager;
-  public static DELTA_TIME = 1 / 60;
 
   private _physics: WorldPhysics;
   private _room: MainRoom;
@@ -34,11 +33,9 @@ export class GameManager {
     this._room = room;
     this._physics = new WorldPhysics(this._room);
     await this._physics.start();
-    this.loop();
   }
 
-  public loop() {
-    this._physics.loop(GameManager.DELTA_TIME);
-    setTimeout(this.loop.bind(this), GameManager.DELTA_TIME * 1000);
+  public loop(dt: number) {
+    this._physics.loop(dt);
   }
 }

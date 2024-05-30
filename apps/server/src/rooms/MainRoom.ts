@@ -40,6 +40,10 @@ export class MainRoom extends Room<MainRoomState> {
 
     await GameManager.getInstance().start(this);
 
+    this.setSimulationInterval((dt) => {
+      GameManager.getInstance().loop(dt);
+    });
+
     const enemy = GameManager.getInstance().entityManager.spawn<Enemy>(EntityType.ENEMY, {
       id: v4(),
       type: EntityType.ENEMY,

@@ -72,7 +72,6 @@ export class AnimatedSpriteComponent extends Component {
 		const spritesheet = (await PIXI.Assets.load(spritesheetFile)) as PIXI.Spritesheet;
 		this.aseprite(spritesheet.data as SpritesheetData);
 		this.spritesheet = spritesheet;
-		this.spritesheet.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 		this.spritesheet.parse().then(() => {
 			this.sprite = new PIXI.AnimatedSprite(this.spritesheet!.animations[this.currentAnimation]);
 			this.sprite.animationSpeed = this.speed;

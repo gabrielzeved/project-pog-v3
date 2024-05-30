@@ -14,7 +14,6 @@ export async function initTextures(worldMap: WorldData) {
 	if (textures.length != 0) return;
 
 	asset = await PIXI.Assets.load(worldMap.tilesets[0].image);
-	asset.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
 
 	const rows = asset.height / CELL_SIZE;
 	const columns = asset.width / CELL_SIZE;

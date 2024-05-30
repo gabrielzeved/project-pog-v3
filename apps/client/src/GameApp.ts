@@ -4,13 +4,15 @@ import { Enemy, EntityType, Player, type MainRoomState, type WorldData } from '@
 import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
 import InputKeyboardManager from './engine/InputKeyboardManager';
+import { ChatManager } from './engine/managers/ChatManager';
 import { LayerManager } from './engine/managers/LayerManager';
+import { drawLayers, initTextures } from './engine/tilemap/Tilemap';
 import { EnemyEntity } from './entities/EnemyEntity';
 import type { GameEntity } from './entities/GameEntity';
 import { PlayerEntity } from './entities/PlayerEntity';
 import './utils/math';
-import { drawLayers, initTextures } from './engine/tilemap/Tilemap';
-import { ChatManager } from './engine/managers/ChatManager';
+
+PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 export class GameApp {
 	public app: PIXI.Application;

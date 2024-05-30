@@ -44,9 +44,21 @@ export class WorldPhysics {
     return entities;
   }
 
+  public rayCast(
+    position: Vector,
+    direction: Vector,
+    length: number,
+    filterExcludeRigidBody?: RAPIER.RigidBody
+  ): boolean {
+    let ray = new RAPIER.Ray(position, direction);
+
+    const hit = this.world.castRay(ray, length, true, null, null, null, filterExcludeRigidBody);
+
+    return !!hit;
+  }
+
   async loop(delta: number) {
     this.world.step();
-
     for (const entry of this.bodies.entries()) {
       const entity = this.room.state.entities.get(entry[0]);
       const body = entry[1];
@@ -64,8 +76,8 @@ export class WorldPhysics {
 
       body.setLinvel(
         {
-          x: correctedMovement.x / delta,
-          y: correctedMovement.y / delta
+          x: correctedMovement.x / (delta / 1000),
+          y: correctedMovement.y / (delta / 1000)
         },
         true
       );

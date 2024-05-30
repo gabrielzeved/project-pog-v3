@@ -29,7 +29,7 @@ export class PlayerEntity extends GameEntity<Player> {
 		this.addComponent(new CharacterAnimationComponent(this));
 
 		if (gameApp.room.sessionId === sessionId) {
-			this.addComponent(new PlayerControllerComponent(this, 3.0));
+			this.addComponent(new PlayerControllerComponent(this, 3));
 		}
 	}
 
@@ -52,9 +52,9 @@ export class PlayerEntity extends GameEntity<Player> {
 			const textY = -8;
 			this.addComponent(new TextComponent(this, text, textX, textY));
 
-			const healthX = spriteWidth / 2 - 50;
+			const healthX = spriteWidth / 2 - 32;
 			const healthY = -28;
-			this.addComponent(new HealthbarComponent(this, healthX, healthY, 100, 16, 'sharp'));
+			this.addComponent(new HealthbarComponent(this, healthX, healthY, 64, 16, 'sharp'));
 		});
 	}
 
