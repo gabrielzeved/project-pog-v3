@@ -4,6 +4,7 @@ import { Enemy, EntityType, Player, type MainRoomState, type WorldData } from '@
 import { Client, Room } from 'colyseus.js';
 import * as PIXI from 'pixi.js';
 import InputKeyboardManager from './engine/InputKeyboardManager';
+import { InputMouseManager } from './engine/InputMouseManager';
 import { ChatManager } from './engine/managers/ChatManager';
 import { LayerManager } from './engine/managers/LayerManager';
 import { drawLayers, initTextures } from './engine/tilemap/Tilemap';
@@ -18,6 +19,7 @@ export class GameApp {
 	public app: PIXI.Application;
 	private entities: GameEntity[] = [];
 	public keyboardManager: InputKeyboardManager;
+	public mouseManager: InputMouseManager;
 	public layerManager: LayerManager;
 	public chatManager: ChatManager;
 	public worldMap: WorldData;
@@ -30,6 +32,7 @@ export class GameApp {
 		this.setupApplication();
 		this.setupResizeHandler();
 		this.setupKeyboardManager();
+		this.setupMouseManager();
 		this.setupLayerManager();
 		this.startGameLoop();
 	}
@@ -56,6 +59,10 @@ export class GameApp {
 			},
 			this.app
 		);
+	}
+
+	private setupMouseManager(): void {
+		this.mouseManager = new InputMouseManager(this.app);
 	}
 
 	private setupLayerManager(): void {
@@ -155,5 +162,6 @@ export class GameApp {
 		for (const entity of this.entities) {
 			entity.update(deltaTime);
 		}
+		this.mouseManager.process();
 	}
 }

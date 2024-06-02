@@ -2,12 +2,12 @@
 	import { onMount } from 'svelte';
 	import '../app.css';
 	import '../main';
+	import { gameApp } from '../main';
+	import characterCreation from '../ui/components/character-creation.svelte';
+	import chatbox from '../ui/components/chatbox.svelte';
 	import login from '../ui/components/login.svelte';
 	import register from '../ui/components/register.svelte';
-	import characterCreation from '../ui/components/characterCreation.svelte';
-	import { gameApp } from '../main';
 	import { AppStates, appState } from './store';
-	import chatbox from '../ui/components/chatbox.svelte';
 
 	let loading = true;
 

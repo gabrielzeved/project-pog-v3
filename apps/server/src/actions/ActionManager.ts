@@ -10,8 +10,12 @@ export interface ActionData {
 export class ActionManager {
   private actions: Map<string, Process> = new Map();
 
-  addAction(id: string, process: Process) {
-    this.actions.set(id, process);
+  addAction(process: Process) {
+    this.actions.set(process.id, process);
+  }
+
+  removeAction(process: Process) {
+    this.actions.delete(process.id);
   }
 
   getData(action: ActionType): ActionData {

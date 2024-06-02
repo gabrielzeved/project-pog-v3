@@ -5,12 +5,13 @@ export class CooldownProcess extends Process {
 
   constructor(
     private _totalDuration: number,
-    public callback: Function
+    public callback?: Function
   ) {
     super();
   }
 
   update(elpased: number): void {
+    super.update(elpased);
     if (this.finished) return;
 
     this.currentTime += elpased;

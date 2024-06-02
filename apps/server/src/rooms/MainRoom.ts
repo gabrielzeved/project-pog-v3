@@ -1,20 +1,21 @@
-import { Enemy, EntityType, MainRoomState, Player } from '@ppog/shared';
-import { ActionType } from '@ppog/shared/actions/ActionType';
-import { DamagableEntity } from '@ppog/shared/entities/DamagableEntity';
+import { Dispatcher } from '@colyseus/command';
+import { MainRoomState } from '@ppog/shared';
 import { User } from '@prisma/client';
 import { Client, Room, ServerError } from 'colyseus';
 import { IncomingMessage } from 'http';
 import * as jwt from 'jsonwebtoken';
-import { v4 } from 'uuid';
 import { GameManager } from '../GameManager';
 import { prismaClient } from '../app.config';
-import World from '../assets/worlds/map.json';
+import { ActionCommand } from '../commands/ActionCommand';
+import { OnJoinCommand } from '../commands/OnJoinCommand';
+import { OnLeaveCommand } from '../commands/OnLeaveCommand';
+import { OnMoveCommand } from '../commands/OnMoveCommand';
 import CharacterController from '../controllers/character';
-import { CooldownProcess } from '../process/CooldownProcess';
 
 export class MainRoom extends Room<MainRoomState> {
   maxClients: number = 50;
   characterController = new CharacterController();
+  dispatcher = new Dispatcher(this);
 
   /* Executes before onJoin */
   static async onAuth(token: string, req: IncomingMessage) {
@@ -47,134 +48,48 @@ export class MainRoom extends Room<MainRoomState> {
       GameManager.getInstance().loop(dt);
     });
 
-    const enemy = GameManager.getInstance().entityManager.spawn<Enemy>(EntityType.ENEMY, {
-      id: v4(),
-      type: EntityType.ENEMY,
-      position: {
-        x: Math.floor(Math.random() * 100),
-        y: Math.floor(Math.random() * 100)
-      },
-      velocity: {
-        x: 0,
-        y: 0
-      },
-      collisionBox: {
-        h: 32,
-        w: 32,
-        x: 0,
-        y: 0
-      }
-    });
+    // const enemy = GameManager.getInstance().entityManager.spawn<Enemy>(EntityType.ENEMY, {
+    //   id: v4(),
+    //   type: EntityType.ENEMY,
+    //   position: {
+    //     x: Math.floor(Math.random() * 100),
+    //     y: Math.floor(Math.random() * 100)
+    //   }
+    // });
 
-    enemy.name = 'Enemy';
+    // enemy.name = 'Enemy';
 
     this.setPatchRate(1000 / 60);
 
     this.onMessage('move', (client, message) => {
-      const entity = this.state.entities.get(client.sessionId);
-
-      if (!entity) return;
-
-      entity.velocity.x = message.x;
-      entity.velocity.y = message.y;
+      this.dispatcher.dispatch(new OnMoveCommand(), {
+        id: client.sessionId,
+        x: message.x,
+        y: message.y
+      });
     });
 
     this.onMessage('attack', (client, message) => {
-      const entity = this.state.entities.get(client.sessionId);
-      const body = GameManager.getInstance().physics.bodies.get(client.sessionId);
-
-      if (!entity) return;
-      if (!(entity instanceof Player)) return;
-      if (entity.currentAction === ActionType.SLASH) return;
-
-      entity.currentAction = ActionType.SLASH;
-
-      GameManager.getInstance().actionManager.addAction(
-        v4(),
-        new CooldownProcess(350, () => {
-          entity.currentAction = ActionType.NONE;
-        })
-      );
-
-      const entities = GameManager.getInstance().physics.boxCast(
-        {
-          x: entity.position.x + 16,
-          y: entity.position.y
-        },
-        {
-          x: 16,
-          y: 16
-        },
-        body
-      );
-
-      for (const target of entities) {
-        if (!(target instanceof DamagableEntity)) return;
-
-        target.health = target.health - 1;
-      }
+      this.dispatcher.dispatch(new ActionCommand(), {
+        id: client.sessionId,
+        type: message
+      });
     });
   }
 
-  async onJoin(client: Client, options: any, userData: User) {
-    console.log(client.sessionId, 'joined!');
-
-    client.userData = {
-      userId: userData.id
-    };
-
-    const character = await this.characterController.getUserCharacter(userData.id);
-
-    if (character) {
-      console.log(`${client.sessionId} logged in as ${character.name}`);
-
-      const player = GameManager.getInstance().entityManager.spawn<Player>(EntityType.PLAYER, {
-        id: client.sessionId,
-        type: EntityType.PLAYER,
-        position: {
-          x: character.x,
-          y: character.y
-        },
-        velocity: {
-          x: 0,
-          y: 0
-        },
-        collisionBox: {
-          h: 32,
-          w: 32,
-          x: 0,
-          y: 0
-        }
-      });
-
-      player.username = character.name;
-
-      client.send('WorldLoad', World);
-    } else {
-      // todo: handle no character error
-    }
+  async onJoin(client: Client, options: any, user: User) {
+    this.dispatcher.dispatch(new OnJoinCommand(), {
+      client,
+      characterController: this.characterController,
+      user
+    });
   }
 
   async onLeave(client: Client, consented: boolean) {
-    console.log(client.sessionId, 'left!');
-
-    const player = this.state.entities.get(client.sessionId) as Player;
-    const character = await this.characterController.getUserCharacter(client.userData.userId);
-
-    if (character) {
-      await this.characterController.updateCharacter(character.id, {
-        name: player.username,
-        x: player.position.x,
-        y: player.position.y
-      });
-    }
-
-    const physics = GameManager.getInstance().physics;
-
-    GameManager.getInstance().physics.world.removeRigidBody(physics.bodies.get(client.sessionId));
-    physics.bodies.delete(client.sessionId);
-
-    this.state.entities.delete(client.sessionId);
+    this.dispatcher.dispatch(new OnLeaveCommand(), {
+      client,
+      characterController: this.characterController
+    });
   }
 
   onDispose() {

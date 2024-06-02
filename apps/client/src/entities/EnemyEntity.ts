@@ -38,9 +38,9 @@ export class EnemyEntity extends GameEntity<Enemy> {
 
 			this.addComponent(new TextComponent(this, text, textX, textY));
 
-			const healthX = spriteWidth / 2 - 32;
+			const healthX = spriteWidth / 2 - 24;
 			const healthY = -4;
-			this.addComponent(new HealthbarComponent(this, healthX, healthY, 64, 16, 'rounded'));
+			this.addComponent(new HealthbarComponent(this, healthX, healthY, 48, 16, 'rounded'));
 		});
 	}
 }

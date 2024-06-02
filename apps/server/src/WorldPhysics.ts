@@ -86,6 +86,9 @@ export class WorldPhysics {
 
       entity.position.x = position.x;
       entity.position.y = position.y;
+
+      entity.velocity.x = entity.velocity.x * body.linearDamping() * (1 - delta / 1000);
+      entity.velocity.y = entity.velocity.y * body.linearDamping() * (1 - delta / 1000);
     }
   }
 }

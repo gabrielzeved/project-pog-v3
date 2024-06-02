@@ -1,5 +1,5 @@
 import type { Entity } from '@ppog/shared';
-import type { vec2 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 import { Container } from 'pixi.js';
 import type { Component } from '../engine/components/Component';
 import { gameApp } from '../main';
@@ -54,6 +54,25 @@ export abstract class GameEntity<T extends Entity | undefined = Entity> extends 
 
 	update(deltaTime: number) {
 		this.getAllComponents().forEach((component) => component.update(deltaTime));
+
+		const newPosition: vec2 = [0, 0];
+		vec2.lerp(
+			newPosition,
+			[this.position.x, this.position.y],
+			this._serverPosition,
+			0.6 * deltaTime * 1000
+		);
+
+		let direction = vec2.sub(
+			[0, 0],
+			[newPosition[0], newPosition[1]],
+			[this.position.x, this.position.y]
+		);
+
+		if (vec2.length(direction) < 0.01) direction = [0, 0];
+
+		this.position.x = newPosition[0];
+		this.position.y = newPosition[1];
 	}
 
 	addComponent<T extends Component>(component: T): void {

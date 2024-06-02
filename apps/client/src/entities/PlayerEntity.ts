@@ -59,17 +59,13 @@ export class PlayerEntity extends GameEntity<Player> {
 			const textY = -12;
 			this.addComponent(new TextComponent(this, text, textX, textY));
 
-			const healthX = spriteWidth / 2 - 32;
+			const healthX = spriteWidth / 2 - 24;
 			const healthY = -4;
-			this.addComponent(new HealthbarComponent(this, healthX, healthY, 64, 16, 'sharp'));
+			this.addComponent(new HealthbarComponent(this, healthX, healthY, 48, 16, 'sharp'));
 		});
 	}
 
 	update(deltaTime: number): void {
-		super.update(deltaTime);
-
-		// if (gameApp.room.sessionId === this.id) return;
-
 		const newPosition: vec2 = [0, 0];
 		vec2.lerp(newPosition, [this.position.x, this.position.y], this._serverPosition, 0.6);
 
@@ -81,11 +77,12 @@ export class PlayerEntity extends GameEntity<Player> {
 
 		if (vec2.length(direction) < 0.01) direction = [0, 0];
 
-		this.getComponent<CharacterAnimationComponent>(
-			ComponentNames.CharacterAnimation
-		)?.updateDirection(direction);
+		if (gameApp.room.sessionId !== this.id) {
+			this.getComponent<CharacterAnimationComponent>(
+				ComponentNames.CharacterAnimation
+			)?.updateDirection(direction);
+		}
 
-		this.position.x = newPosition[0];
-		this.position.y = newPosition[1];
+		super.update(deltaTime);
 	}
 }
