@@ -72,7 +72,9 @@ export class MainRoom extends Room<MainRoomState> {
     this.onMessage('attack', (client, message) => {
       this.dispatcher.dispatch(new ActionCommand(), {
         id: client.sessionId,
-        type: message
+        type: message.type,
+        x: message.x,
+        y: message.y
       });
     });
   }

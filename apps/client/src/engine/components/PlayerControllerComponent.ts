@@ -61,7 +61,11 @@ export class PlayerControllerComponent extends Component {
 		}
 
 		if (mouse.isButtonDown(MouseButton.LEFT)) {
-			gameApp.room.send('attack', ActionType.SLASH);
+			gameApp.room.send('attack', {
+				type: ActionType.SLASH,
+				x: mouse.position.x,
+				y: mouse.position.y
+			});
 		}
 
 		vec2.normalize(this.direction, direction);
