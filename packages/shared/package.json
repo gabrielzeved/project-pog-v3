@@ -11,6 +11,7 @@
     "svelte": "^4.2.8"
   },
   "dependencies": {
+    "colyseus": "^0.15.17",
     "gl-matrix": "^3.4.3"
   }
 }

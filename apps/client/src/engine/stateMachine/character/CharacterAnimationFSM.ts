@@ -40,6 +40,8 @@ abstract class AnimationState extends State {
 	enter(): void {
 		if (!this.lockUntilFinished) return;
 
+		if (!this._parent.sprite.sprite) return;
+
 		this._playAnimation();
 		this._parent.sprite.sprite.loop = false;
 		this._parent.sprite.sprite.onComplete = this.onComplete.bind(this);
@@ -47,6 +49,8 @@ abstract class AnimationState extends State {
 	}
 
 	exit(): void {
+		if (!this._parent.sprite.sprite) return;
+
 		this._parent.sprite.sprite.loop = true;
 		this._parent.sprite.sprite.onComplete = undefined;
 	}
@@ -62,9 +66,6 @@ class IdleState extends AnimationState {
 	get name() {
 		return 'idle';
 	}
-	update(delta: number): void {
-		super.update(delta);
-	}
 }
 
 class WalkState extends AnimationState {
@@ -73,10 +74,6 @@ class WalkState extends AnimationState {
 
 	get name() {
 		return 'walk';
-	}
-
-	update(delta: number): void {
-		super.update(delta);
 	}
 }
 

@@ -2,4 +2,9 @@
   "extends": "@ppog/config/base.json",
   "include": ["."],
   "exclude": ["dist", "build", "node_modules"],
+  "compilerOptions": {
+    "strict": false,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
+  }
 }

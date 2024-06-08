@@ -49,4 +49,8 @@ export class CharacterAnimationComponent extends Component {
 			this.isMoving = false;
 		}
 	}
+
+	attack() {
+		this.stateMachine.update(0.0, 'attack');
+	}
 }

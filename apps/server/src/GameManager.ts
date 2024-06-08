@@ -1,64 +1,49 @@
-import { ClientPackets } from '@ppog/shared';
-import { EntitySnapshotPacket } from '@ppog/shared/packets/client/entities/EntitySnapshotPacket';
-import { Server } from './Server';
-import { PlayerEntity } from './entities/PlayerEntity';
-import { WorldEntity } from './entities/WorldEntity';
+import { WorldPhysics } from './WorldPhysics';
+import { ActionManager } from './actions/ActionManager';
+import { EntityManager } from './entities/EntityManager';
+import { MainRoom } from './rooms';
+
 export class GameManager {
-  private entities: WorldEntity[] = [];
-  public tick: number = 0;
+  private static instance: GameManager;
 
-  constructor(private server: Server) {}
+  private _physics: WorldPhysics;
+  private _room: MainRoom;
+  private _entityManager: EntityManager = new EntityManager();
+  private _actionManager: ActionManager = new ActionManager();
 
-  getAllEntities() {
-    return this.entities;
+  public get entityManager() {
+    return this._entityManager;
   }
 
-  getEntity(entityId: string) {
-    return this.entities.find((entity) => entity.id === entityId);
+  public get physics() {
+    return this._physics;
   }
 
-  spawnEntity<T extends WorldEntity = WorldEntity>(entity: T): T {
-    this.entities.push(entity);
-
-    this.server.sendPacketToAll(
-      new ClientPackets.EntitySpawnPacket({
-        id: entity.id,
-        type: entity.type,
-        name: entity.name,
-        position: entity.position,
-        spritePath: entity.spritePath
-      })
-    );
-
-    return entity;
+  public get room() {
+    return this._room;
   }
 
-  destroyEntity(entityId: string) {
-    // this.server.queueEvent(new EntityDestroyEvent(entityId));
-
-    const index = this.entities.findIndex((entity) => entity.id === entityId);
-    const entity = this.entities[index];
-
-    if (!entity) return;
-
-    this.server.sendPacketToAll(new ClientPackets.EntityDestroyPacket(entity.id));
-
-    this.entities.splice(index, 1);
+  public get actionManager() {
+    return this._actionManager;
   }
 
-  update(dt: number) {
-    this.tick++;
-    for (const entity of this.entities) {
-      entity.update(dt);
-
-      this.server.sendPacketToAll(
-        new EntitySnapshotPacket({
-          id: entity.id,
-          position: entity.position,
-          velocity: entity.velocity,
-          tick: entity instanceof PlayerEntity ? entity.lastInputSequenceNumber : 0
-        })
-      );
+  public static getInstance(): GameManager {
+    if (!GameManager.instance) {
+      GameManager.instance = new GameManager();
     }
+
+    return GameManager.instance;
+  }
+
+  public async start(room: MainRoom) {
+    this._room = room;
+    this._physics = new WorldPhysics(this._room);
+    this._actionManager = new ActionManager();
+    await this._physics.start();
+  }
+
+  public loop(dt: number) {
+    this._actionManager.update(dt);
+    this._physics.loop(dt);
   }
 }

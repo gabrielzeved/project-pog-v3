@@ -1,78 +1,47 @@
-import { ServerPackets, processInput, processSnapshot, type Snapshot } from '@ppog/shared';
-import type { EntitySnapshotPacketData } from '@ppog/shared/packets/client/entities/EntitySnapshotPacket';
+import { ActionType } from '@ppog/shared/actions/ActionType';
 import { vec2 } from 'gl-matrix';
-import type { GameEntity } from '../../entities/GameEntity';
-import { client, gameApp } from '../../main';
+import type { PlayerEntity } from '../../entities/PlayerEntity';
+import { gameApp } from '../../main';
+import { MouseButton } from '../InputMouseManager';
 import type { CharacterAnimationComponent } from './CharacterAnimationComponent';
 import { Component, ComponentNames } from './Component';
 
-interface InputPayload {
-	tick: number;
-	direction: vec2;
-	delta: number;
-}
-
-type State = Snapshot & {
-	tick: number;
-};
-
 export class PlayerControllerComponent extends Component {
 	private speed: number;
-	private velocity: vec2 = [0, 0];
 	public direction: vec2 = [0, 0];
 	private _lastDirection: vec2 = [0, 0];
 
-	//NETWORK
-	private _inputSequenceNumber: number = 0;
-	private _pendingInputs: InputPayload[] = [];
-	private _lastSnapshot?: State;
-
-	constructor(entity: GameEntity, speed: number) {
-		super(entity, ComponentNames.PlayerController);
+	constructor(player: PlayerEntity, speed: number) {
+		super(player, ComponentNames.PlayerController);
 		this.speed = speed;
 	}
 
-	onNetworkUpdate(packet: EntitySnapshotPacketData) {
-		this._lastSnapshot = {
-			position: packet.position,
-			velocity: packet.velocity,
-			tick: packet.tick
-		};
+	updateCamera() {
+		const zoomLevel = 1;
+		const ease = 1;
+		const screenWidth = window.innerWidth;
+		const screenHeight = window.innerHeight;
 
-		this.handleServerReconcillitation(this._lastSnapshot!);
-		this.applySnapshot(this._lastSnapshot!);
-	}
+		const cameraX = this.entity.position.x * zoomLevel - screenWidth / 2;
+		const cameraY = this.entity.position.y * zoomLevel - screenHeight / 2;
 
-	handleServerReconcillitation(snapshot: Snapshot) {
-		let finalSnapshot = snapshot;
+		const maxX = gameApp.app.stage.width - screenWidth; // / 4
+		const maxY = gameApp.app.stage.height - screenHeight; // / 4
 
-		let j = 0;
-		while (j < this._pendingInputs.length) {
-			const input = this._pendingInputs[j];
-			if (input.tick < this._lastSnapshot!.tick) {
-				this._pendingInputs.splice(j, 1);
-			} else {
-				finalSnapshot = processSnapshot(
-					{
-						position: snapshot.position,
-						velocity: processInput(input.direction)
-					},
-					input.delta
-				);
+		let futureX = Math.max(0, Math.min(cameraX, maxX));
+		gameApp.app.stage.x = -Math.mix(gameApp.app.stage.x, futureX, ease);
 
-				j++;
-			}
-		}
-		return finalSnapshot;
-	}
+		let futureY = Math.max(0, Math.min(cameraY, maxY));
+		gameApp.app.stage.y = -Math.mix(gameApp.app.stage.y, futureY, ease);
 
-	applySnapshot(snapshot: Snapshot) {
-		this.velocity = snapshot.velocity;
-		this.entity.setPosition(snapshot.position[0], snapshot.position[1]);
+		gameApp.app.stage.scale.set(zoomLevel);
 	}
 
 	update(dt: number) {
+		this.updateCamera();
+
 		const input = gameApp.keyboardManager;
+		const mouse = gameApp.mouseManager;
 
 		vec2.copy(this._lastDirection, this.direction);
 
@@ -91,32 +60,20 @@ export class PlayerControllerComponent extends Component {
 			vec2.add(direction, direction, [-1, 0]);
 		}
 
+		if (mouse.isButtonDown(MouseButton.LEFT)) {
+			gameApp.room.send('attack', {
+				type: ActionType.SLASH,
+				x: mouse.position.x,
+				y: mouse.position.y
+			});
+		}
+
 		vec2.normalize(this.direction, direction);
 
-		const packet = new ServerPackets.PlayerMovePacket(
-			this.direction,
-			this._inputSequenceNumber,
-			dt
-		);
-		client.sendPacket(packet);
-
-		this._pendingInputs.push({
-			direction: this.direction,
-			tick: this._inputSequenceNumber,
-			delta: dt
+		gameApp.room.send('move', {
+			x: this.direction[0] * this.speed,
+			y: this.direction[1] * this.speed
 		});
-		this._inputSequenceNumber++;
-
-		const newVelocity = processInput(this.direction);
-		const predictionSnapshot = processSnapshot(
-			{
-				position: [this.entity.position.x, this.entity.position.y],
-				velocity: newVelocity
-			},
-			dt
-		);
-
-		this.applySnapshot(predictionSnapshot);
 
 		this.entity
 			.getComponent<CharacterAnimationComponent>(ComponentNames.CharacterAnimation)

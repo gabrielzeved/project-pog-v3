@@ -1,8 +1,12 @@
 {
   "extends": "@ppog/config/base.json",
-  "include": ["."],
+  "include": [".", "../../packages/shared/actions/ActionType.ts"],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "target": "ESNext",
+    "strict": false,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
   }
 }

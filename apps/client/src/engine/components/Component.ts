@@ -6,7 +6,8 @@ export enum ComponentNames {
 	NetworkEntity = 'NetworkEntityComponent',
 	AnimatedSprite = 'AnimatedSpriteComponent',
 	CharacterAnimation = 'CharacterAnimationComponent',
-	Text = 'TextComponent'
+	Text = 'TextComponent',
+	Healthbar = 'HealthbarComponent'
 }
 
 export class Component {

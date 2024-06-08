@@ -8,8 +8,10 @@
 		"resolveJsonModule": true,
 		"skipLibCheck": true,
 		"sourceMap": true,
-		"strict": true,
-		"strictPropertyInitialization": false
+		"strict": false,
+		"strictPropertyInitialization": false,
+		"experimentalDecorators": true,
+		"useDefineForClassFields": false
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//
